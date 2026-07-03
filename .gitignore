@@ -31,3 +31,28 @@ build/
 
 ### VS Code ###
 .vscode/
+.history/
+
+
+### Environment Files ###
+.env
+.env.*
+
+.DS_Store
+Thumbs.db
+
+*.log
+logs/
+
+*.pid
+*.seed
+
+bin/
+generated/
+
+jacoco.exec
+coverage/
+
+.spring-boot-devtools.properties
+
+

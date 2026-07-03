@@ -10,6 +10,7 @@ import dev.cameloasa.todoapi.auth.dto.RegisterDTOView;
 import dev.cameloasa.todoapi.auth.dto.SessionResponseDTO;
 import dev.cameloasa.todoapi.auth.service.AuthService;
 
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/auth")
 public class AuthController {

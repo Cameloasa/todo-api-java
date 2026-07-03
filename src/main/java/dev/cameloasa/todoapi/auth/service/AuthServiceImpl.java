@@ -13,15 +13,19 @@ import dev.cameloasa.todoapi.auth.dto.RegisterDTOView;
 import dev.cameloasa.todoapi.domanin.entity.User;
 import dev.cameloasa.todoapi.exception.DataDuplicateException;
 import dev.cameloasa.todoapi.exception.DataNotFoundException;
+import dev.cameloasa.todoapi.exception.EmailServiceFailedException;
 import dev.cameloasa.todoapi.domanin.entity.Person;
 import dev.cameloasa.todoapi.domanin.entity.Role;
 import dev.cameloasa.todoapi.repository.UserRepository;
+import dev.cameloasa.todoapi.service.EmailService;
 import dev.cameloasa.todoapi.repository.PersonRepository;
 import dev.cameloasa.todoapi.repository.RoleRepository;
 
 
 import dev.cameloasa.todoapi.converter.UserConverter;
 import dev.cameloasa.todoapi.converter.PersonConverter;
+
+
 
 @Service
 @RequiredArgsConstructor
@@ -34,52 +38,64 @@ public class AuthServiceImpl implements AuthService {
 
     private final UserConverter userConverter;
     private final PersonConverter personConverter;
+    private final EmailService emailService;
+
 
     @Override
-    public RegisterDTOView register(RegisterDTOForm dto) {
+public RegisterDTOView register(RegisterDTOForm dto) {
 
-        // verificăm email
-        if (userRepository.existsByEmail(dto.getEmail())) {
-            throw new DataDuplicateException("Email already registered");
-        }
-
-        // verificăm username
-        if (userRepository.existsByUsername(dto.getUsername())) {
-            throw new DataDuplicateException("Username already taken");
-        }
-
-        //create default role USER if not exists
-        
-        Role userRole = roleRepository
-            .findByName("USER")
-            .orElseThrow(() -> new DataNotFoundException("Default role USER not found"));
-
-        // create user
-        User user = new User();
-        user.setEmail(dto.getEmail());
-        user.setUsername(dto.getUsername());
-        user.setPassword(dto.getPassword());
-        user.setExpired(false);
-        user.setRoles(Set.of(userRole));
-
-        userRepository.save(user);
-
-        // create person
-        Person person = new Person();
-        person.setFirstName(dto.getFirstName());
-        person.setLastName(dto.getLastName());
-        person.setUser(user);
-
-        personRepository.save(person);
-
-        // convertim la DTO view
-        RegisterDTOView response = new RegisterDTOView();
-        response.setUser(userConverter.toUserDTOView(user));
-        response.setPerson(personConverter.toPersonDTOView(person));
-        response.setSuccess(true);
-
-        return response;
+    // verificăm email
+    if (userRepository.existsByEmail(dto.getEmail())) {
+        throw new DataDuplicateException("Email already registered");
     }
+
+    // verificăm username
+    if (userRepository.existsByUsername(dto.getUsername())) {
+        throw new DataDuplicateException("Username already taken");
+    }
+
+    // create default role USER if not exists
+    Role userRole = roleRepository
+        .findByName("USER")
+        .orElseThrow(() -> new DataNotFoundException("Default role USER not found"));
+
+    // create user
+    User user = new User();
+    user.setEmail(dto.getEmail());
+    user.setUsername(dto.getUsername());
+    user.setPassword(dto.getPassword());
+    user.setExpired(false);
+    user.setRoles(Set.of(userRole));
+
+    userRepository.save(user);
+
+    // create person
+    Person person = new Person();
+    person.setFirstName(dto.getFirstName());
+    person.setLastName(dto.getLastName());
+    person.setUser(user);
+
+    personRepository.save(person);
+
+    // 🔥 AICI INTEGRAM EMAIL SERVICE
+    try {
+        emailService.sendRegistrationEmail(user.getEmail());
+    } catch (EmailServiceFailedException ex) {
+        // poți decide ce faci:
+        // fie ignori și continui
+        // fie arunci excepția mai departe
+        throw ex;
+    }
+
+    // convertim la DTO view
+    RegisterDTOView response = new RegisterDTOView();
+    response.setUser(userConverter.toUserDTOView(user));
+    response.setPerson(personConverter.toPersonDTOView(person));
+    response.setSuccess(true);
+
+    return response;
+}
+
 
     @Override
     public SessionResponseDTO login(LoginDTOForm dto) {
