@@ -1,17 +1,16 @@
 package dev.cameloasa.todoapi.domanin.dto;
 
+import java.util.Set;
 import lombok.*;
 
-import java.util.Set;
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
 @Builder
-
-
+@ToString
 public class UserDTOView {
-    private String email;
-    private Set<RoleDTOView> roles;
+  private String email;
+  private boolean expired;
+  private Set<RoleDTOView> roles;
 }

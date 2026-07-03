@@ -1,10 +1,7 @@
 package dev.cameloasa.todoapi.domanin.dto;
 
-import lombok.*;
-
 import java.time.LocalDate;
-
-import dev.cameloasa.todoapi.domanin.entity.Person;
+import lombok.*;
 
 @Getter
 @Setter
@@ -13,10 +10,9 @@ import dev.cameloasa.todoapi.domanin.entity.Person;
 @ToString
 @Builder
 public class TaskDTOView {
-    private Long id;
-    private String title;
-    private String description;
-    private Person person;
-    private LocalDate Deadline;
-    private boolean done;
+  private Long id;
+  private String title;
+  private String description;
+  private LocalDate deadline;
+  private boolean done;
 }

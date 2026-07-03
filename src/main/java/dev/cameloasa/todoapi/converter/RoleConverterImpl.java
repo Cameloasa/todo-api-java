@@ -1,28 +1,31 @@
 package dev.cameloasa.todoapi.converter;
 
-import org.springframework.stereotype.Component;
-
+import dev.cameloasa.todoapi.domanin.dto.RoleDTOForm;
 import dev.cameloasa.todoapi.domanin.dto.RoleDTOView;
 import dev.cameloasa.todoapi.domanin.entity.Role;
+import org.springframework.stereotype.Component;
 
 @Component
 public class RoleConverterImpl implements RoleConverter {
+
     @Override
-    public RoleDTOView toRoleDTO(Role entity) {
+    public RoleDTOView toRoleDTOView(Role entity) {
+        if (entity == null) return null;
+
         return RoleDTOView.builder()
                 .id(entity.getId())
                 .name(entity.getName())
                 .build();
-        //return new RoleDTOView(entity.getId(), entity.getName());
-
     }
 
     @Override
-    public Role toRoleEntity(RoleDTOView dto) {
+    public Role toRoleEntity(RoleDTOForm dto) {
+        if (dto == null) return null;
+
         return Role.builder()
                 .id(dto.getId())
                 .name(dto.getName())
                 .build();
-        //return new Role(dto.getId(), dto.getName());
     }
 }
+

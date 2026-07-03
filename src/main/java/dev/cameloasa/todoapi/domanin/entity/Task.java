@@ -1,51 +1,59 @@
 package dev.cameloasa.todoapi.domanin.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
-
 import java.time.LocalDate;
+import lombok.*;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(exclude = "person")
-@ToString(exclude = "person")
 @Builder
-
 @Entity
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(exclude = "person")
 public class Task {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(updatable = false)
-    private Long id;
-    private String title;
-    private String description;
-    private LocalDate deadline;
-    private boolean done;
 
-    @ManyToOne
-    @JoinColumn(name = "person_id")
-    private Person person;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(updatable = false)
+  @EqualsAndHashCode.Include
+  private Long id;
 
-    public Task(String title, String description, LocalDate deadline, boolean done, Person person) {
-        this.title = title;
-        this.description = description;
-        this.deadline = deadline;
-        this.done = done;
-        this.person = person;
-    }
+  @Column(nullable = false)
+  private String title;
 
-    public Task(String title, String description, LocalDate deadline,Person person) {
-        this.title = title;
-        this.description = description;
-        this.deadline = deadline;
-        this.person = person;
-    }
+  private String description;
 
-    public Task(String title, String description, LocalDate deadline) {
-        this.title = title;
-        this.description = description;
-        this.deadline = deadline;
-    }
+  private LocalDate deadline;
+
+  private boolean done;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "person_id", nullable = false) // task-ul has allways owner
+  private Person person;
+
+  // Constructor complet
+  public Task(String title, String description, LocalDate deadline, boolean done, Person person) {
+    this.title = title;
+    this.description = description;
+    this.deadline = deadline;
+    this.done = done;
+    this.person = person;
+  }
+
+  // Constructor without done (implicit false)
+  public Task(String title, String description, LocalDate deadline, Person person) {
+    this.title = title;
+    this.description = description;
+    this.deadline = deadline;
+    this.person = person;
+  }
+
+  // Constructor without person (for DTO-uri)
+  public Task(String title, String description, LocalDate deadline) {
+    this.title = title;
+    this.description = description;
+    this.deadline = deadline;
+  }
 }

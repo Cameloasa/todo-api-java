@@ -1,39 +1,44 @@
 package dev.cameloasa.todoapi.converter;
 
-import org.springframework.stereotype.Component;
-
 import dev.cameloasa.todoapi.domanin.dto.RoleDTOView;
+import dev.cameloasa.todoapi.domanin.dto.UserDTOForm;
 import dev.cameloasa.todoapi.domanin.dto.UserDTOView;
 import dev.cameloasa.todoapi.domanin.entity.Role;
 import dev.cameloasa.todoapi.domanin.entity.User;
-
 import java.util.stream.Collectors;
+import org.springframework.stereotype.Component;
 
 @Component
 public class UserConverterImpl implements UserConverter {
-    @Override
-    public UserDTOView toUserDTO(User entity) {
-        return UserDTOView.builder()
-                .email(entity.getEmail())
-                .roles(entity.getRoles().stream()
-                        .map(role -> RoleDTOView.builder()
-                                .name(role.getName())
-                                .build())
-                        .collect(Collectors.toSet()))
-                                .build();
 
+    private final RoleConverter roleConverter;
+
+    public UserConverterImpl(RoleConverter roleConverter) {
+        this.roleConverter = roleConverter;
     }
 
     @Override
-    public User toUserEntity(UserDTOView dto) {
-        return User.builder()
-                .email(dto.getEmail())
-                .roles(dto.getRoles().stream()
-                        .map(roleDTOView -> Role.builder()
-                                .name(roleDTOView.getName())
-                                .build())
+    public UserDTOView toUserDTOView(User entity) {
+        if (entity == null) return null;
+
+        return UserDTOView.builder()
+                .email(entity.getEmail())
+                .expired(entity.isExpired())
+                .roles(entity.getRoles().stream()
+                        .map(roleConverter::toRoleDTOView)
                         .collect(Collectors.toSet()))
                 .build();
+    }
 
+    @Override
+    public User toUserEntity(UserDTOForm dto) {
+        if (dto == null) return null;
+
+        return User.builder()
+                .email(dto.getEmail())
+                .password(dto.getPassword()) // hashing în service
+                .expired(dto.isExpired())
+                // rol will be set in service
+                .build();
     }
 }

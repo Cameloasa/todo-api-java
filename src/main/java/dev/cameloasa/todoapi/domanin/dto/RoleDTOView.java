@@ -8,9 +8,8 @@ import lombok.*;
 @NoArgsConstructor
 @ToString
 @Builder
-
 public class RoleDTOView {
 
-    private Long id;
-    private String name;
+  private Long id;
+  private String name;
 }

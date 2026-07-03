@@ -1,29 +1,35 @@
 package dev.cameloasa.todoapi.service;
 
-import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
-
 import dev.cameloasa.todoapi.domanin.dto.TaskDTOForm;
 import dev.cameloasa.todoapi.domanin.dto.TaskDTOView;
-import dev.cameloasa.todoapi.domanin.entity.Task;
+import java.time.LocalDate;
+import java.util.List;
 
 public interface TaskService {
-    // create
+
     TaskDTOView create(TaskDTOForm dtoForm);
-    // findById
     TaskDTOView findById(Long id);
-    // update
     TaskDTOView update(TaskDTOForm dtoForm);
-    // delete
     void delete(Long id);
-    // findTasksByPersonId
+
+    List<TaskDTOView> findAll();
+
     List<TaskDTOView> findByPersonId(Long personId);
-    // findTasksBetweenStartAndEndDate
     List<TaskDTOView> findByDeadlineBetween(LocalDate startDate, LocalDate endDate);
-    // findAllUnassignedTasks
     List<TaskDTOView> findByPersonIsNull();
-    //findAllUnfinishedTasksAndOverdue
     List<TaskDTOView> findUnfinishedAndOverdueTasks();
+
+    List<TaskDTOView> findByTitleContaining(String title);
+    List<TaskDTOView> findByDescriptionContaining(String description);
+
+    List<TaskDTOView> findTasksDueToday();
+    List<TaskDTOView> findUpcomingTasks();
+
+    TaskDTOView markDone(Long id);
+    TaskDTOView markUndone(Long id);
+
+    TaskDTOView removeTaskFromPerson(Long taskId);
+    TaskDTOView reassignTaskToPerson(Long taskId, Long newPersonId);
+
     TaskDTOView addTaskToPerson(Long personId, TaskDTOForm taskDTOForm);
 }

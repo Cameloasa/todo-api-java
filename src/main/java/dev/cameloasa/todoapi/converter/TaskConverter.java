@@ -6,6 +6,7 @@ import dev.cameloasa.todoapi.domanin.entity.Task;
 
 public interface TaskConverter {
 
-    TaskDTOView toTaskDTOView(Task entity);
-    Task toTaskEntity(TaskDTOForm dtoForm);
+  TaskDTOView toTaskDTOView(Task entity);
+
+  Task toTaskEntity(TaskDTOForm dtoForm);
 }

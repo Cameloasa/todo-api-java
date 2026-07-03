@@ -1,20 +1,19 @@
 package dev.cameloasa.todoapi.domanin.dto;
 
+import java.util.List;
 import lombok.*;
 
-import java.util.List;
-
-import dev.cameloasa.todoapi.domanin.entity.Task;
-import dev.cameloasa.todoapi.domanin.entity.User;
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
 @Builder
-
 public class PersonDTOView {
-    private Long id;
-    private String name;
-
+  private Long id;
+  private String firstName;
+  private String lastName;
+  private String username;
+  private String userEmail;
+  private List<TaskDTOView> tasks;
 }

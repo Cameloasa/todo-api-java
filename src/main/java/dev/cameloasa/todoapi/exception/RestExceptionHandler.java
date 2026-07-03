@@ -13,31 +13,40 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+  @Override
+  protected ResponseEntity<Object> handleMethodArgumentNotValid(
+      MethodArgumentNotValidException ex,
+      HttpHeaders headers,
+      HttpStatusCode status,
+      WebRequest request) {
 
-        StringBuilder details = new StringBuilder();
-        ex.getBindingResult().getFieldErrors().forEach((fieldError) -> {
-            details.append(fieldError.getField() + ": ");
-            details.append(" ");
-            details.append(fieldError.getDefaultMessage());
-            details.append(", ");
+    StringBuilder details = new StringBuilder();
+    ex.getBindingResult()
+        .getFieldErrors()
+        .forEach(
+            (fieldError) -> {
+              details.append(fieldError.getField() + ": ");
+              details.append(" ");
+              details.append(fieldError.getDefaultMessage());
+              details.append(", ");
+            });
 
-        });
+    ErrorDTO responseBody = new ErrorDTO(HttpStatus.BAD_REQUEST, details.toString());
 
-        ErrorDTO responseBody = new ErrorDTO(HttpStatus.BAD_REQUEST, details.toString());
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseBody);
+  }
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseBody);
+  @ExceptionHandler({
+    DataNotFoundException.class,
+    DataDuplicateException.class,
+    IllegalArgumentException.class
+  })
+  public ResponseEntity<ErrorDTO> handleCustomExceptions(Exception ex) {
+    HttpStatus status = HttpStatus.BAD_REQUEST;
+    if (ex instanceof DataNotFoundException) {
+      status = HttpStatus.NOT_FOUND;
     }
-
-    @ExceptionHandler({DataNotFoundException.class, DataDuplicateException.class, IllegalArgumentException.class})
-    public ResponseEntity<ErrorDTO>handleCustomExceptions(Exception ex){
-        HttpStatus status = HttpStatus.BAD_REQUEST;
-        if (ex instanceof DataNotFoundException) {
-            status = HttpStatus.NOT_FOUND;
-        }
-        ErrorDTO responseBody = new ErrorDTO(status, ex.getMessage());
-        return ResponseEntity.status(status).body(responseBody);
-
-    }
+    ErrorDTO responseBody = new ErrorDTO(status, ex.getMessage());
+    return ResponseEntity.status(status).body(responseBody);
+  }
 }

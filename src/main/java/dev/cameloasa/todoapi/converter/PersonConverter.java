@@ -5,7 +5,7 @@ import dev.cameloasa.todoapi.domanin.dto.PersonDTOView;
 import dev.cameloasa.todoapi.domanin.entity.Person;
 
 public interface PersonConverter {
-    PersonDTOView toPersonDTOView(Person entity);
-    Person toPersonEntity(PersonDTOForm dtoForm);
+  PersonDTOView toPersonDTOView(Person entity);
 
+  Person toPersonEntity(PersonDTOForm dtoForm);
 }
