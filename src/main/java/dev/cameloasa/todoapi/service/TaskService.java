@@ -7,29 +7,44 @@ import java.util.List;
 
 public interface TaskService {
 
-    TaskDTOView create(TaskDTOForm dtoForm);
-    TaskDTOView findById(Long id);
-    TaskDTOView update(TaskDTOForm dtoForm);
-    void delete(Long id);
+  // create, read, update, delete
+  TaskDTOView create(TaskDTOForm dtoForm);
 
-    List<TaskDTOView> findAll();
+  TaskDTOView findById(Long id);
 
-    List<TaskDTOView> findByPersonId(Long personId);
-    List<TaskDTOView> findByDeadlineBetween(LocalDate startDate, LocalDate endDate);
-    List<TaskDTOView> findByPersonIsNull();
-    List<TaskDTOView> findUnfinishedAndOverdueTasks();
+  TaskDTOView update(TaskDTOForm dtoForm);
 
-    List<TaskDTOView> findByTitleContaining(String title);
-    List<TaskDTOView> findByDescriptionContaining(String description);
+  void delete(Long id);
 
-    List<TaskDTOView> findTasksDueToday();
-    List<TaskDTOView> findUpcomingTasks();
+  // find all
+  List<TaskDTOView> findAll();
 
-    TaskDTOView markDone(Long id);
-    TaskDTOView markUndone(Long id);
+  // find by various criteria
+  List<TaskDTOView> findByPersonId(Long personId);
 
-    TaskDTOView removeTaskFromPerson(Long taskId);
-    TaskDTOView reassignTaskToPerson(Long taskId, Long newPersonId);
+  List<TaskDTOView> findByDeadlineBetween(LocalDate startDate, LocalDate endDate);
 
-    TaskDTOView addTaskToPerson(Long personId, TaskDTOForm taskDTOForm);
+  List<TaskDTOView> findByPersonIsNull();
+
+  List<TaskDTOView> findUnfinishedAndOverdueTasks();
+
+  // additional methods for searching and managing tasks
+  List<TaskDTOView> findByTitleContaining(String title);
+
+  List<TaskDTOView> findByDescriptionContaining(String description);
+
+  // methods for finding tasks based on deadlines
+  List<TaskDTOView> findTasksDueToday();
+
+  List<TaskDTOView> findUpcomingTasks();
+
+  // methods for marking tasks as done or undone
+  TaskDTOView markDone(Long id);
+
+  TaskDTOView markUndone(Long id);
+
+  // methods for managing task assignments to persons
+  TaskDTOView removeTaskFromPerson(Long taskId);
+
+  TaskDTOView reassignTaskToPerson(Long taskId, Long newPersonId);
 }

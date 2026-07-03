@@ -4,15 +4,16 @@ import dev.cameloasa.todoapi.domanin.dto.UserDTOForm;
 import dev.cameloasa.todoapi.domanin.dto.UserDTOView;
 
 public interface UserService {
-  // register user(email, password,role)
+
+  // Register user (email, password, roles)
   UserDTOView register(UserDTOForm dtoForm);
 
   // Find user by email
   UserDTOView getByEmail(String email);
 
-  // disable user by email
+  // Disable user (expired = true)
   void disableEmail(String email);
 
-  // enable user by email
+  // Enable user (expired = false)
   void enableEmail(String email);
 }

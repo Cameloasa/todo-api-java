@@ -6,7 +6,7 @@ import dev.cameloasa.todoapi.domanin.entity.User;
 
 public interface UserConverter {
 
-    UserDTOView toUserDTOView(User entity);
+  UserDTOView toUserDTOView(User entity);
 
-    User toUserEntity(UserDTOForm dto);
+  User toUserEntity(UserDTOForm dto);
 }

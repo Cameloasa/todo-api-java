@@ -6,7 +6,7 @@ import dev.cameloasa.todoapi.domanin.entity.Role;
 
 public interface RoleConverter {
 
-    RoleDTOView toRoleDTOView(Role entity);
+  RoleDTOView toRoleDTOView(Role entity);
 
-    Role toRoleEntity(RoleDTOForm dto);
+  Role toRoleEntity(RoleDTOForm dto);
 }

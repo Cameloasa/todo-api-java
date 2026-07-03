@@ -5,18 +5,30 @@ import dev.cameloasa.todoapi.domanin.dto.PersonDTOView;
 import java.util.List;
 
 public interface PersonService {
-  // create
+  // Create
   PersonDTOView create(PersonDTOForm dtoForm);
 
-  // findById
+  // Read
   PersonDTOView findById(Long id);
 
-  // findAll
   List<PersonDTOView> findAll();
 
-  // update
+  // Update
   PersonDTOView update(PersonDTOForm dtoForm);
 
-  // delete
+  // Delete
   void delete(Long id);
+
+  // Extra useful finders
+  PersonDTOView findByUsername(String username);
+
+  PersonDTOView findByUserEmail(String email);
+
+  // Search
+  List<PersonDTOView> searchByFirstName(String firstName);
+
+  List<PersonDTOView> searchByLastName(String lastName);
+
+  // Business logic
+  List<PersonDTOView> findIdlePeople();
 }

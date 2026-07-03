@@ -1,7 +1,6 @@
 package dev.cameloasa.todoapi.service;
 
 import dev.cameloasa.todoapi.converter.PersonConverter;
-import dev.cameloasa.todoapi.converter.UserConverter;
 import dev.cameloasa.todoapi.domanin.dto.PersonDTOForm;
 import dev.cameloasa.todoapi.domanin.dto.PersonDTOView;
 import dev.cameloasa.todoapi.domanin.entity.Person;
@@ -12,7 +11,6 @@ import dev.cameloasa.todoapi.repository.PersonRepository;
 import dev.cameloasa.todoapi.repository.UserRepository;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,36 +20,52 @@ public class PersonServiceImpl implements PersonService {
   private final PersonRepository personRepository;
   private final PersonConverter personConverter;
   private final UserRepository userRepository;
-  private final UserConverter userConverter;
 
-  @Autowired
   public PersonServiceImpl(
       PersonRepository personRepository,
       PersonConverter personConverter,
-      UserRepository userRepository,
-      UserConverter userConverter) {
+      UserRepository userRepository) {
     this.personRepository = personRepository;
     this.personConverter = personConverter;
     this.userRepository = userRepository;
-    this.userConverter = userConverter;
   }
 
   @Override
   @Transactional
   public PersonDTOView create(PersonDTOForm dtoForm) {
-    // Check the param
-    if (dtoForm == null) throw new IllegalArgumentException("This Form is cannot be accepted.");
-    // 2. Check if the person exist in the database
-    boolean personExists = personRepository.existsById(dtoForm.getId());
-    // 3.if person exist throw an Exception - Data Duplicate Exception
-    if (personExists) {
-      throw new DataDuplicateException("The Person already exists.");
+
+    if (dtoForm == null) {
+      throw new IllegalArgumentException("PersonDTOForm cannot be null.");
     }
-    // 4. Convert PersonDTOForm to Person entity using PersonConverter
+
+    // Username must be unique
+    if (personRepository.existsByUsername(dtoForm.getUsername())) {
+      throw new DataDuplicateException("Username already exists.");
+    }
+
+    // User email must be unique in Person
+    if (personRepository.existsByUserEmail(dtoForm.getUserEmail())) {
+      throw new DataDuplicateException("A person is already linked to this user email.");
+    }
+
+    // User must exist
+    User user =
+        userRepository
+            .findByEmail(dtoForm.getUserEmail())
+            .orElseThrow(
+                () ->
+                    new DataNotFoundException(
+                        "User not found with email: " + dtoForm.getUserEmail()));
+
+    // Convert DTO → Entity
     Person person = personConverter.toPersonEntity(dtoForm);
-    // 5. Save the Person to the database
+
+    // Link Person ↔ User
+    person.setUser(user);
+
+    // Save
     Person savedPerson = personRepository.save(person);
-    // 6. Convert saved Person entity to PersonDTOView using PersonConverter
+
     return personConverter.toPersonDTOView(savedPerson);
   }
 
@@ -77,27 +91,43 @@ public class PersonServiceImpl implements PersonService {
   @Override
   @Transactional
   public PersonDTOView update(PersonDTOForm dtoForm) {
-    // Check the param
-    if (dtoForm == null) throw new IllegalArgumentException("This Form is not accepted.");
-    // Find the existing person
+
+    if (dtoForm == null) {
+      throw new IllegalArgumentException("PersonDTOForm cannot be null.");
+    }
+
     Person existingPerson =
         personRepository
             .findById(dtoForm.getId())
-            .orElseThrow(() -> new DataNotFoundException("The Person does not exist."));
-    // Update the person's details
-    existingPerson.setName(dtoForm.getName());
-    // Update associated user if email is provided
-    if (dtoForm.getUserEmail() != null && userRepository.existsByEmail(dtoForm.getUserEmail())) {
-      User user =
-          userRepository
-              .findByEmail(dtoForm.getUserEmail())
-              .orElseThrow(() -> new DataNotFoundException("The User does not exist."));
-      existingPerson.setUser(user);
+            .orElseThrow(() -> new DataNotFoundException("Person not found."));
+
+    // Username must be unique (except current person)
+    if (!existingPerson.getUsername().equals(dtoForm.getUsername())
+        && personRepository.existsByUsername(dtoForm.getUsername())) {
+      throw new DataDuplicateException("Username already exists.");
     }
-    // Save the updated person
-    Person updatedPerson = personRepository.save(existingPerson);
-    // Convert to DTO view and return
-    return personConverter.toPersonDTOView(updatedPerson);
+
+    // If userEmail changed → validate uniqueness
+    if (!existingPerson.getUser().getEmail().equals(dtoForm.getUserEmail())
+        && personRepository.existsByUserEmail(dtoForm.getUserEmail())) {
+      throw new DataDuplicateException("Another person is already linked to this user email.");
+    }
+
+    // Find user
+    User user =
+        userRepository
+            .findByEmail(dtoForm.getUserEmail())
+            .orElseThrow(() -> new DataNotFoundException("User not found."));
+
+    // Update fields
+    existingPerson.setFirstName(dtoForm.getFirstName());
+    existingPerson.setLastName(dtoForm.getLastName());
+    existingPerson.setUsername(dtoForm.getUsername());
+    existingPerson.setUser(user);
+
+    Person updated = personRepository.save(existingPerson);
+
+    return personConverter.toPersonDTOView(updated);
   }
 
   @Override
@@ -109,5 +139,48 @@ public class PersonServiceImpl implements PersonService {
     }
     // Delete the person
     personRepository.deleteById(id);
+  }
+
+  @Override
+  public PersonDTOView findByUsername(String username) {
+    Person person =
+        personRepository
+            .findByUsername(username)
+            .orElseThrow(
+                () -> new DataNotFoundException("Person not found with username: " + username));
+
+    return personConverter.toPersonDTOView(person);
+  }
+
+  @Override
+  public PersonDTOView findByUserEmail(String email) {
+    Person person =
+        personRepository
+            .findByUserEmail(email)
+            .orElseThrow(
+                () -> new DataNotFoundException("Person not found with user email: " + email));
+
+    return personConverter.toPersonDTOView(person);
+  }
+
+  @Override
+  public List<PersonDTOView> searchByFirstName(String firstName) {
+    return personRepository.findByFirstNameContainingIgnoreCase(firstName).stream()
+        .map(personConverter::toPersonDTOView)
+        .toList();
+  }
+
+  @Override
+  public List<PersonDTOView> searchByLastName(String lastName) {
+    return personRepository.findByLastNameContainingIgnoreCase(lastName).stream()
+        .map(personConverter::toPersonDTOView)
+        .toList();
+  }
+
+  @Override
+  public List<PersonDTOView> findIdlePeople() {
+    return personRepository.findIdlePeople().stream()
+        .map(personConverter::toPersonDTOView)
+        .toList();
   }
 }

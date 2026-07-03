@@ -8,24 +8,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class RoleConverterImpl implements RoleConverter {
 
-    @Override
-    public RoleDTOView toRoleDTOView(Role entity) {
-        if (entity == null) return null;
+  @Override
+  public RoleDTOView toRoleDTOView(Role entity) {
+    if (entity == null) return null;
 
-        return RoleDTOView.builder()
-                .id(entity.getId())
-                .name(entity.getName())
-                .build();
-    }
+    return RoleDTOView.builder().id(entity.getId()).name(entity.getName()).build();
+  }
 
-    @Override
-    public Role toRoleEntity(RoleDTOForm dto) {
-        if (dto == null) return null;
+  @Override
+  public Role toRoleEntity(RoleDTOForm dto) {
+    if (dto == null) return null;
 
-        return Role.builder()
-                .id(dto.getId())
-                .name(dto.getName())
-                .build();
-    }
+    return Role.builder().id(dto.getId()).name(dto.getName()).build();
+  }
 }
-
