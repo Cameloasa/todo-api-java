@@ -19,9 +19,6 @@ public interface PersonService {
   // Delete
   void delete(Long id);
 
-  // Extra useful finders
-  PersonDTOView findByUsername(String username);
-
   PersonDTOView findByUserEmail(String email);
 
   // Search

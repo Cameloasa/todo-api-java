@@ -13,7 +13,7 @@ public class EmailService {
 
   // 2. Setup RestTemplate, URL
   private final RestTemplate restTemplate = new RestTemplate();
-  private final String EMAIL_SERVICE_SEND_URL = "http://localhost:9090/api/v1/email";
+  private final String EMAIL_SERVICE_SEND_URL = "http://localhost:9090/email";
 
   public HttpStatusCode sendRegistrationEmail(String registeredEmail) {
 

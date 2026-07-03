@@ -21,6 +21,7 @@ public class UserConverterImpl implements UserConverter {
 
     return UserDTOView.builder()
         .email(entity.getEmail())
+        .username(entity.getUsername())
         .expired(entity.isExpired())
         .roles(
             entity.getRoles().stream()
@@ -35,6 +36,7 @@ public class UserConverterImpl implements UserConverter {
 
     return User.builder()
         .email(dto.getEmail())
+        .username(dto.getUsername())
         .password(dto.getPassword()) // hashing în service
         .expired(dto.isExpired())
         // rol will be set in service

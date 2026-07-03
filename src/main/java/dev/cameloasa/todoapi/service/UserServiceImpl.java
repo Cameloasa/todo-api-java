@@ -96,9 +96,70 @@ public class UserServiceImpl implements UserService {
     userRepository.updateExpiredByEmail(email, false);
   }
 
+  @Override
+  public UserDTOView getByUsername(String username) {
+    User user =
+        userRepository
+            .findByUsername(username)
+            .orElseThrow(() -> new DataNotFoundException("Username not found."));
+
+    return userConverter.toUserDTOView(user);
+  }
+
+  @Override
+  public boolean existsByUsername(String username) {
+    return userRepository.existsByUsername(username);
+  }
+
+  @Override
+  public java.util.List<UserDTOView> getAll() {
+    return userRepository.findAll().stream()
+        .map(userConverter::toUserDTOView)
+        .collect(Collectors.toList());
+  }
+
+  @Override
+  @Transactional
+  public UserDTOView update(String email, UserDTOForm dtoForm) {
+    validateEmailExists(email);
+
+    User existingUser = userRepository.findById(email).orElseThrow();
+
+    // Update fields
+    existingUser.setUsername(dtoForm.getUsername());
+    existingUser.setEmail(dtoForm.getEmail());
+    existingUser.setPassword(passwordEncoder.encode(dtoForm.getPassword()));
+    existingUser.setExpired(dtoForm.isExpired());
+
+    // Update roles
+    Set<Role> roles =
+        dtoForm.getRoleIds().stream()
+            .map(
+                roleId ->
+                    roleRepository
+                        .findById(roleId)
+                        .orElseThrow(() -> new DataNotFoundException("Role is not valid")))
+            .collect(Collectors.toSet());
+    existingUser.setRoles(roles);
+
+    // Save updated user
+    User updatedUser = userRepository.save(existingUser);
+
+    return userConverter.toUserDTOView(updatedUser);
+  }
+
+  @Override
+  @Transactional
+  public void delete(String email) {
+    validateEmailExists(email);
+    userRepository.deleteById(email);
+  }
+
   private void validateEmailExists(String email) {
     if (!userRepository.existsByEmail(email)) {
       throw new DataNotFoundException("Email not found.");
     }
   }
+
+
 }

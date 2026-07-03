@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface PersonRepository extends JpaRepository<Person, Long> {
 
-  
+
   // Find a person by user email
   Optional<Person> findByUserEmail(String email);
 

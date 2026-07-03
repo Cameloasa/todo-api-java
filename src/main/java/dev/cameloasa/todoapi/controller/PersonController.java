@@ -53,13 +53,6 @@ public class PersonController {
     return ResponseEntity.noContent().build();
   }
 
-  // FIND BY USERNAME
-  @GetMapping("/username/{username}")
-  public ResponseEntity<PersonDTOView> doFindByUsername(@PathVariable String username) {
-    PersonDTOView responseBody = personService.findByUsername(username);
-    return ResponseEntity.ok(responseBody);
-  }
-
   // FIND BY USER EMAIL
   @GetMapping("/user-email/{email}")
   public ResponseEntity<PersonDTOView> doFindByUserEmail(@PathVariable String email) {
