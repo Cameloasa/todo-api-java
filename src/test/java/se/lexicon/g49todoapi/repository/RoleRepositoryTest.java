@@ -6,7 +6,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import se.lexicon.g49todoapi.domanin.entity.Role;
+
+import dev.cameloasa.todoapi.domanin.entity.Role;
+import dev.cameloasa.todoapi.repository.RoleRepository;
 
 import java.util.Optional;
 

@@ -1,11 +1,14 @@
 package se.lexicon.g49todoapi.repository;
 
 import jakarta.transaction.Transactional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import se.lexicon.g49todoapi.domanin.entity.Person;
+
+import dev.cameloasa.todoapi.domanin.entity.Person;
+import dev.cameloasa.todoapi.repository.PersonRepository;
 
 import java.util.List;
 
