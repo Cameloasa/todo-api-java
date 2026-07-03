@@ -40,7 +40,7 @@ public class PersonController {
   }
 
   // UPDATE
-  @PutMapping
+  @PatchMapping
   public ResponseEntity<PersonDTOView> doUpdate(@RequestBody PersonDTOForm dtoForm) {
     PersonDTOView updated = personService.update(dtoForm);
     return ResponseEntity.ok(updated);

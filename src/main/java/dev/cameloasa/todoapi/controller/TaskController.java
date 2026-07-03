@@ -42,7 +42,7 @@ public class TaskController {
   }
 
   // UPDATE
-  @PutMapping
+  @PatchMapping
   public ResponseEntity<TaskDTOView> doUpdate(@RequestBody TaskDTOForm dtoForm) {
     TaskDTOView updated = taskService.update(dtoForm);
     return ResponseEntity.ok(updated);
