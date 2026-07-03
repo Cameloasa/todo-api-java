@@ -3,56 +3,88 @@ package dev.cameloasa.todoapi.controller;
 import dev.cameloasa.todoapi.domanin.dto.*;
 import dev.cameloasa.todoapi.service.PersonService;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@CrossOrigin(origins = "http://localhost:3000") // Replace with your frontend URL
-@RequestMapping("api/v1/persons")
+@CrossOrigin(origins = "http://localhost:3000")
+@RequestMapping("/persons")
 @RestController
 public class PersonController {
 
   private final PersonService personService;
 
-  @Autowired
   public PersonController(PersonService personService) {
     this.personService = personService;
   }
 
+  // CREATE
   @PostMapping
   public ResponseEntity<PersonDTOView> doCreate(@RequestBody PersonDTOForm dtoForm) {
-    System.out.println("DTO Form: " + dtoForm);
     PersonDTOView responseBody = personService.create(dtoForm);
     return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
   }
 
+  // FIND BY ID
   @GetMapping("/{id}")
   public ResponseEntity<PersonDTOView> doFindPersonById(@PathVariable Long id) {
-    System.out.println(">>>>>>> get Person by Id has been executed");
-    System.out.println("Id: " + id);
-
     PersonDTOView responseBody = personService.findById(id);
-    return ResponseEntity.status(HttpStatus.OK).body(responseBody);
+    return ResponseEntity.ok(responseBody);
   }
 
-  @GetMapping("/roles")
-  public ResponseEntity<List<PersonDTOView>> doFindAllRoles() {
+  // FIND ALL
+  @GetMapping
+  public ResponseEntity<List<PersonDTOView>> doFindAll() {
     List<PersonDTOView> responseBody = personService.findAll();
     return ResponseEntity.ok(responseBody);
   }
 
-  @PutMapping("/update")
-  public ResponseEntity<Void> doUpdate(@RequestBody PersonDTOForm dtoForm) {
-    System.out.println(">>>>>>> Updated Person By DTO form has been executed");
-    personService.update(dtoForm);
-    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+  // UPDATE
+  @PutMapping
+  public ResponseEntity<PersonDTOView> doUpdate(@RequestBody PersonDTOForm dtoForm) {
+    PersonDTOView updated = personService.update(dtoForm);
+    return ResponseEntity.ok(updated);
   }
 
-  @PutMapping("/delete/{id}")
+  // DELETE
+  @DeleteMapping("/{id}")
   public ResponseEntity<Void> doDelete(@PathVariable Long id) {
-    System.out.println(">>>>>>> Deleted Person By Id has been executed");
     personService.delete(id);
-    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    return ResponseEntity.noContent().build();
+  }
+
+  // FIND BY USERNAME
+  @GetMapping("/username/{username}")
+  public ResponseEntity<PersonDTOView> doFindByUsername(@PathVariable String username) {
+    PersonDTOView responseBody = personService.findByUsername(username);
+    return ResponseEntity.ok(responseBody);
+  }
+
+  // FIND BY USER EMAIL
+  @GetMapping("/user-email/{email}")
+  public ResponseEntity<PersonDTOView> doFindByUserEmail(@PathVariable String email) {
+    PersonDTOView responseBody = personService.findByUserEmail(email);
+    return ResponseEntity.ok(responseBody);
+  }
+
+  // SEARCH BY FIRST NAME
+  @GetMapping("/search/first-name/{firstName}")
+  public ResponseEntity<List<PersonDTOView>> doSearchByFirstName(@PathVariable String firstName) {
+    List<PersonDTOView> responseBody = personService.searchByFirstName(firstName);
+    return ResponseEntity.ok(responseBody);
+  }
+
+  // SEARCH BY LAST NAME
+  @GetMapping("/search/last-name/{lastName}")
+  public ResponseEntity<List<PersonDTOView>> doSearchByLastName(@PathVariable String lastName) {
+    List<PersonDTOView> responseBody = personService.searchByLastName(lastName);
+    return ResponseEntity.ok(responseBody);
+  }
+
+  // FIND IDLE PEOPLE (no tasks)
+  @GetMapping("/idle")
+  public ResponseEntity<List<PersonDTOView>> doFindIdlePeople() {
+    List<PersonDTOView> responseBody = personService.findIdlePeople();
+    return ResponseEntity.ok(responseBody);
   }
 }

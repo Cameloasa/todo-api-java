@@ -1,7 +1,6 @@
-package se.lexicon.g49todoapi.repository;
+package dev.cameloasa.todoapi.repository;
 
 import dev.cameloasa.todoapi.domanin.entity.Role;
-import dev.cameloasa.todoapi.repository.RoleRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;

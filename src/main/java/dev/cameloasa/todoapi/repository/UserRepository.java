@@ -10,27 +10,27 @@ import org.springframework.data.repository.query.Param;
 
 public interface UserRepository extends JpaRepository<User, String> {
 
-  // Find if email exists
-  Boolean existsByEmail(String email);
+    Boolean existsByEmail(String email);
+    Optional<User> findByEmail(String email);
 
-  // Find user by email
-  Optional<User> findByEmail(String email);
+    boolean existsByUsername(String username);
+    Optional<User> findByUsername(String username);
 
-  // Find if email exists and expired status
-  boolean existsByEmailAndExpired(String email, boolean expired);
+    @Query("SELECT u FROM User u WHERE u.email = :value OR u.username = :value")
+    Optional<User> findByEmailOrUsername(@Param("value") String value);
 
-  // Find user by email and expired status
-  Optional<User> findByEmailAndExpired(String email, boolean expired);
+    boolean existsByEmailAndExpired(String email, boolean expired);
+    
+    Optional<User> findByEmailAndExpired(String email, boolean expired);
 
-  // Update expired status by email
-  @Modifying
-  @Transactional
-  @Query("UPDATE User u SET u.expired = :status WHERE u.email = :email")
-  void updateExpiredByEmail(@Param("email") String email, @Param("status") boolean status);
+    @Modifying
+    @Transactional
+    @Query("UPDATE User u SET u.expired = :status WHERE u.email = :email")
+    void updateExpiredByEmail(@Param("email") String email, @Param("status") boolean status);
 
-  // Update password by email
-  @Modifying
-  @Transactional
-  @Query("UPDATE User u SET u.password = :password WHERE u.email = :email")
-  void updatePasswordByEmail(@Param("email") String email, @Param("password") String password);
+    @Modifying
+    @Transactional
+    @Query("UPDATE User u SET u.password = :password WHERE u.email = :email")
+    void updatePasswordByEmail(@Param("email") String email, @Param("password") String password);
 }
+

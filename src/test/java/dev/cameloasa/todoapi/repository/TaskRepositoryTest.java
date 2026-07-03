@@ -1,9 +1,7 @@
-package se.lexicon.g49todoapi.repository;
+package dev.cameloasa.todoapi.repository;
 
 import dev.cameloasa.todoapi.domanin.entity.Person;
 import dev.cameloasa.todoapi.domanin.entity.Task;
-import dev.cameloasa.todoapi.repository.PersonRepository;
-import dev.cameloasa.todoapi.repository.TaskRepository;
 import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +18,7 @@ public class TaskRepositoryTest {
 
   @BeforeEach
   void setUp() {
-    Person existingPerson = personRepository.save(new Person("Anna Banana"));
+    Person person = Person.builder().firstName("John").lastName("Smith").build();
     Task existingTask1 =
         taskRepository.save(
             new Task(

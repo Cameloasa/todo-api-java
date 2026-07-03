@@ -11,6 +11,7 @@ import lombok.*;
 @ToString
 public class UserDTOView {
   private String email;
+  private String username;
   private boolean expired;
   private Set<RoleDTOView> roles;
 }

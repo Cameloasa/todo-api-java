@@ -23,6 +23,9 @@ public class User {
   @Column(nullable = false, length = 100)
   private String password;
 
+  @Column(unique = true)
+  private String username;
+
   private boolean expired;
 
   @ManyToMany
@@ -33,9 +36,10 @@ public class User {
   @Builder.Default
   private Set<Role> roles = new HashSet<>();
 
-  public User(String email, String password) {
+  public User(String email, String password, String username) {
     this.email = email;
     this.password = password;
+    this.username = username;
   }
 
   public void addRole(Role role) {

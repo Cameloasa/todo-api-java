@@ -1,7 +1,6 @@
-package se.lexicon.g49todoapi.repository;
+package dev.cameloasa.todoapi.repository;
 
 import dev.cameloasa.todoapi.domanin.entity.Person;
-import dev.cameloasa.todoapi.repository.PersonRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -13,7 +12,7 @@ public class PersonRepositoryTest {
 
   @BeforeEach
   public void setUp() {
-    person = Person.builder().name("John Doe").build();
+    person = Person.builder().firstName("John").lastName("Smith").build();
     personRepository.save(person);
   }
   /*@Transactional

@@ -9,7 +9,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.3.4</version> 
+        <version>3.3.13</version> 
         <relativePath/>
     </parent>
 
@@ -82,7 +82,7 @@
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>2.6.0</version> <!-- versiune stabilă actuală -->
+            <version>2.6.0</version> 
         </dependency>
 
         <!-- Starter for tests: JUnit 5, Mockito, AssertJ -->

@@ -13,7 +13,6 @@ public class PersonDTOView {
   private Long id;
   private String firstName;
   private String lastName;
-  private String username;
   private String userEmail;
   private List<TaskDTOView> tasks;
 }

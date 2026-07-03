@@ -137,10 +137,10 @@ GET /tasks/title/{title} — task‑uri filtrate după titlu
 ```
 
 🔹The REST API will be available at:
-[http://localhost:7000]
+[http://localhost:(8000]
 
 🔹Swagger:
-[http://localhost:7000/swagger.html]
+[http://localhost:8080/swagger-ui.html]
 
 ## 🧪 Running the Project
 
@@ -153,7 +153,7 @@ mvn compile
 Run:
 
 ```bash
-mvn exec:java
+mvn spring-boot:run
 ```
 
 Run tests:

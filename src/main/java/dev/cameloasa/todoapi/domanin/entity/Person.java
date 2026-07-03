@@ -28,9 +28,6 @@ public class Person {
   @Column(nullable = false)
   private String lastName;
 
-  @Column(unique = true)
-  private String username;
-
   @OneToOne
   @JoinColumn(name = "user_email", unique = true)
   private User user;
@@ -39,10 +36,9 @@ public class Person {
   @Builder.Default
   private List<Task> tasks = new ArrayList<>();
 
-  public Person(String firstName, String lastName, String username) {
+  public Person(String firstName, String lastName) {
     this.firstName = firstName;
     this.lastName = lastName;
-    this.username = username;
   }
 
   public void addTask(Task... tasks) {
