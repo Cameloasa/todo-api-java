@@ -39,6 +39,7 @@ public class TaskServiceImpl implements TaskService {
     Task task = taskConverter.toTaskEntity(dtoForm);
 
     if (dtoForm.getPersonId() != null) {
+      @SuppressWarnings("null")
       Person person =
           personRepository
               .findById(dtoForm.getPersonId())
@@ -46,12 +47,14 @@ public class TaskServiceImpl implements TaskService {
       task.setPerson(person);
     }
 
+    @SuppressWarnings("null")
     Task savedTask = taskRepository.save(task);
     return taskConverter.toTaskDTOView(savedTask);
   }
 
   @Override
   public TaskDTOView findById(Long id) {
+    @SuppressWarnings("null")
     Task task =
         taskRepository.findById(id).orElseThrow(() -> new DataNotFoundException("Task not found"));
     return taskConverter.toTaskDTOView(task);
@@ -67,6 +70,7 @@ public class TaskServiceImpl implements TaskService {
   public TaskDTOView update(TaskDTOForm dtoForm) {
     if (dtoForm == null) throw new IllegalArgumentException("TaskDTOForm is null");
 
+    @SuppressWarnings("null")
     Task existingTask =
         taskRepository
             .findById(dtoForm.getId())
@@ -78,6 +82,7 @@ public class TaskServiceImpl implements TaskService {
     existingTask.setDone(dtoForm.isDone());
 
     if (dtoForm.getPersonId() != null) {
+      @SuppressWarnings("null")
       Person person =
           personRepository
               .findById(dtoForm.getPersonId())
@@ -89,6 +94,7 @@ public class TaskServiceImpl implements TaskService {
     return taskConverter.toTaskDTOView(updatedTask);
   }
 
+  @SuppressWarnings("null")
   @Override
   @Transactional
   public void delete(Long id) {
@@ -154,6 +160,7 @@ public class TaskServiceImpl implements TaskService {
   @Override
   @Transactional
   public TaskDTOView markDone(Long id) {
+    @SuppressWarnings("null")
     Task task =
         taskRepository.findById(id).orElseThrow(() -> new DataNotFoundException("Task not found"));
 
@@ -166,6 +173,7 @@ public class TaskServiceImpl implements TaskService {
   @Override
   @Transactional
   public TaskDTOView markUndone(Long id) {
+    @SuppressWarnings("null")
     Task task =
         taskRepository.findById(id).orElseThrow(() -> new DataNotFoundException("Task not found"));
 
@@ -178,6 +186,7 @@ public class TaskServiceImpl implements TaskService {
   @Override
   @Transactional
   public TaskDTOView removeTaskFromPerson(Long taskId) {
+    @SuppressWarnings("null")
     Task task =
         taskRepository
             .findById(taskId)
@@ -192,11 +201,13 @@ public class TaskServiceImpl implements TaskService {
   @Override
   @Transactional
   public TaskDTOView reassignTaskToPerson(Long taskId, Long newPersonId) {
+    @SuppressWarnings("null")
     Task task =
         taskRepository
             .findById(taskId)
             .orElseThrow(() -> new DataNotFoundException("Task not found"));
 
+    @SuppressWarnings("null")
     Person person =
         personRepository
             .findById(newPersonId)

@@ -47,6 +47,7 @@ public class UserServiceImpl implements UserService {
     }
 
     // Validate roles
+    @SuppressWarnings("null")
     Set<Role> roles =
         dtoForm.getRoleIds().stream()
             .map(
@@ -74,6 +75,7 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public UserDTOView getByEmail(String email) {
+    @SuppressWarnings("null")
     User user =
         userRepository
             .findById(email)
@@ -123,6 +125,7 @@ public class UserServiceImpl implements UserService {
   public UserDTOView update(String email, UserDTOForm dtoForm) {
     validateEmailExists(email);
 
+    @SuppressWarnings("null")
     User existingUser = userRepository.findById(email).orElseThrow();
 
     // Update fields
@@ -132,6 +135,7 @@ public class UserServiceImpl implements UserService {
     existingUser.setExpired(dtoForm.isExpired());
 
     // Update roles
+    @SuppressWarnings("null")
     Set<Role> roles =
         dtoForm.getRoleIds().stream()
             .map(
@@ -148,6 +152,7 @@ public class UserServiceImpl implements UserService {
     return userConverter.toUserDTOView(updatedUser);
   }
 
+  @SuppressWarnings("null")
   @Override
   @Transactional
   public void delete(String email) {
@@ -160,6 +165,4 @@ public class UserServiceImpl implements UserService {
       throw new DataNotFoundException("Email not found.");
     }
   }
-
-
 }

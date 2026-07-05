@@ -11,6 +11,7 @@ import dev.cameloasa.todoapi.repository.PersonRepository;
 import dev.cameloasa.todoapi.repository.UserRepository;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,7 +38,6 @@ public class PersonServiceImpl implements PersonService {
     if (dtoForm == null) {
       throw new IllegalArgumentException("PersonDTOForm cannot be null.");
     }
-
 
     // User email must be unique in Person
     if (personRepository.findByUserEmail(dtoForm.getUserEmail()).isPresent()) {
@@ -66,8 +66,9 @@ public class PersonServiceImpl implements PersonService {
   }
 
   @Override
-  public PersonDTOView findById(Long id) {
+  public PersonDTOView findById(@Nullable Long id) {
     // 1.Find the person by id in repository else throw exception
+    @SuppressWarnings("null")
     Person person =
         personRepository
             .findById(id)
@@ -92,11 +93,11 @@ public class PersonServiceImpl implements PersonService {
       throw new IllegalArgumentException("PersonDTOForm cannot be null.");
     }
 
+    @SuppressWarnings("null")
     Person existingPerson =
         personRepository
             .findById(dtoForm.getId())
             .orElseThrow(() -> new DataNotFoundException("Person not found."));
-
 
     // If userEmail changed → validate uniqueness
     if (!existingPerson.getUser().getEmail().equals(dtoForm.getUserEmail())
@@ -120,6 +121,7 @@ public class PersonServiceImpl implements PersonService {
     return personConverter.toPersonDTOView(updated);
   }
 
+  @SuppressWarnings("null")
   @Override
   @Transactional
   public void delete(Long id) {
@@ -130,7 +132,6 @@ public class PersonServiceImpl implements PersonService {
     // Delete the person
     personRepository.deleteById(id);
   }
-
 
   @Override
   public PersonDTOView findByUserEmail(String email) {

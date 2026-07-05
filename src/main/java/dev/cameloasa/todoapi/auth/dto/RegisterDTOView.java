@@ -9,8 +9,7 @@ import lombok.Setter;
 @Setter
 public class RegisterDTOView {
 
-    private UserDTOView user;
-    private PersonDTOView person;
-    private boolean success;
+  private UserDTOView user;
+  private PersonDTOView person;
+  private boolean success;
 }
-

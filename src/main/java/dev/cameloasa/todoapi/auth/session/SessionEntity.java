@@ -1,8 +1,8 @@
 package dev.cameloasa.todoapi.auth.session;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.Column;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,16 +11,14 @@ import lombok.Setter;
 @Setter
 public class SessionEntity {
 
-    @Id
-    private String token;
+  @Id private String token;
 
-    @Column(nullable = false)
-    private String userEmail;
+  @Column(nullable = false)
+  private String userEmail;
 
-    @Column(nullable = false)
-    private long createdAt;
+  @Column(nullable = false)
+  private long createdAt;
 
-    @Column(nullable = false)
-    private long expiresAt;
+  @Column(nullable = false)
+  private long expiresAt;
 }
-

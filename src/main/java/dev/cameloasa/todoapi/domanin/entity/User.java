@@ -12,6 +12,7 @@ import lombok.*;
 @ToString
 @Builder
 @Entity
+@Table(name = "users")
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class User {
 
