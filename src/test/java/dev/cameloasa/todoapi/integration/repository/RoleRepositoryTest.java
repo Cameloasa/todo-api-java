@@ -23,6 +23,7 @@ public class RoleRepositoryTest {
   private Role roleUser;
   private Role roleAdmin;
 
+  @SuppressWarnings("null")
   @BeforeEach
   void setUp() {
     roleUser = new Role();

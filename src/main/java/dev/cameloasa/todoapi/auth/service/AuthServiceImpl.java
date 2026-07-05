@@ -136,6 +136,7 @@ public class AuthServiceImpl implements AuthService {
     return response;
   }
 
+  @SuppressWarnings("null")
   @Override
   public void logout(String sessionToken) {
 

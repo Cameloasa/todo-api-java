@@ -29,6 +29,7 @@ public class TaskRepositoryTest {
     private Person person;
     private Task task1, task2, task3, task4;
 
+    @SuppressWarnings("null")
     @BeforeEach
     void setUp() {
         // Clean DB for isolation
