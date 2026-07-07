@@ -12,6 +12,7 @@ import dev.cameloasa.todoapi.domanin.entity.User;
 import dev.cameloasa.todoapi.exception.DataDuplicateException;
 import dev.cameloasa.todoapi.exception.DataNotFoundException;
 import dev.cameloasa.todoapi.exception.EmailServiceFailedException;
+import dev.cameloasa.todoapi.exception.InvalidCredentialsException;
 import dev.cameloasa.todoapi.repository.PersonRepository;
 import dev.cameloasa.todoapi.repository.RoleRepository;
 import dev.cameloasa.todoapi.repository.UserRepository;
@@ -36,12 +37,12 @@ public class AuthServiceImpl implements AuthService {
   @Override
   public RegisterDTOView register(RegisterDTOForm dto) {
 
-    // verificăm email
+    // verify email
     if (userRepository.existsByEmail(dto.getEmail())) {
       throw new DataDuplicateException("Email already registered");
     }
 
-    // verificăm username
+    // verify username
     if (userRepository.existsByUsername(dto.getUsername())) {
       throw new DataDuplicateException("Username already taken");
     }
@@ -70,7 +71,7 @@ public class AuthServiceImpl implements AuthService {
 
     personRepository.save(person);
 
-    // 🔥 AICI INTEGRAM EMAIL SERVICE
+    // 🔥 integration with email service
     try {
       emailService.sendRegistrationEmail(user.getEmail());
     } catch (EmailServiceFailedException ex) {
@@ -80,7 +81,7 @@ public class AuthServiceImpl implements AuthService {
       throw ex;
     }
 
-    // convertim la DTO view
+    // convert to DTO view
     RegisterDTOView response = new RegisterDTOView();
     response.setUser(userConverter.toUserDTOView(user));
     response.setPerson(personConverter.toPersonDTOView(person));
@@ -94,7 +95,7 @@ public class AuthServiceImpl implements AuthService {
 
     User user = null;
 
-    // login cu email
+    // login with email
     if (dto.getEmail() != null && !dto.getEmail().isBlank()) {
       user =
           userRepository
@@ -102,7 +103,7 @@ public class AuthServiceImpl implements AuthService {
               .orElseThrow(() -> new RuntimeException("Invalid email"));
     }
 
-    // login cu username
+    // login with username
     else if (dto.getUsername() != null && !dto.getUsername().isBlank()) {
       user =
           userRepository
@@ -112,21 +113,21 @@ public class AuthServiceImpl implements AuthService {
       throw new RuntimeException("Email or username must be provided");
     }
 
-    // verificăm parola
+    // verify password
     if (!user.getPassword().equals(dto.getPassword())) {
-      throw new RuntimeException("Invalid password");
+      throw new InvalidCredentialsException("Invalid password");
     }
 
-    // creăm sesiune
+    // create session
     String token = sessionService.createSession(user.getEmail());
 
-    // căutăm person (acum Person are user, nu userEmail)
+    // search Person (person has a reference to user, so we can search by user email)
     Person person =
         personRepository
             .findByUserEmail(user.getEmail())
             .orElseThrow(() -> new RuntimeException("Person not found for user"));
 
-    // construim răspuns
+    // build response
     SessionResponseDTO response = new SessionResponseDTO();
     response.setSessionToken(token);
     response.setUser(userConverter.toUserDTOView(user));

@@ -42,12 +42,27 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     DataDuplicateException.class,
     IllegalArgumentException.class
   })
+
   public ResponseEntity<ErrorDTO> handleCustomExceptions(Exception ex) {
-    HttpStatus status = HttpStatus.BAD_REQUEST;
+
+    HttpStatus status = HttpStatus.BAD_REQUEST; // default = 400
+
     if (ex instanceof DataNotFoundException) {
-      status = HttpStatus.NOT_FOUND;
+        status = HttpStatus.NOT_FOUND; // 404
     }
+
+    if (ex instanceof DataDuplicateException) {
+        status = HttpStatus.CONFLICT; // 409
+    }
+
     ErrorDTO responseBody = new ErrorDTO(status, ex.getMessage());
     return ResponseEntity.status(status).body(responseBody);
-  }
+}
+
+@ExceptionHandler(InvalidCredentialsException.class)
+public ResponseEntity<ErrorDTO> handleInvalidCredentials(InvalidCredentialsException ex) {
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            .body(new ErrorDTO(HttpStatus.UNAUTHORIZED, ex.getMessage()));
+}
+
 }

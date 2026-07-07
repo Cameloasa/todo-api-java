@@ -1,5 +1,3 @@
 package dev.cameloasa.todoapi.integration.api;
 
-public class TaskApiIntegrationTest {
-    
-}
+public class TaskApiIntegrationTest {}
