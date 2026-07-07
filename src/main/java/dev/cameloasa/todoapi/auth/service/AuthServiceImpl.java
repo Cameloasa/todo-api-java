@@ -35,6 +35,9 @@ public class AuthServiceImpl implements AuthService {
   private final PersonConverter personConverter;
   private final EmailService emailService;
 
+  // ---------------------------------------------------------
+  // Register
+  // ---------------------------------------------------------
   @Override
   public RegisterDTOView register(RegisterDTOForm dto) {
 
@@ -91,6 +94,9 @@ public class AuthServiceImpl implements AuthService {
     return response;
   }
 
+  // ---------------------------------------------------------
+  // Login
+  // ---------------------------------------------------------
   @Override
   public SessionResponseDTO login(LoginDTOForm dto) {
 
@@ -142,17 +148,23 @@ public class AuthServiceImpl implements AuthService {
     return response;
   }
 
+  // ---------------------------------------------------------
+  // Logout: 
+  // ---------------------------------------------------------
   @SuppressWarnings("null")
   @Override
   public void logout(String sessionToken) {
 
     if (!sessionService.isValid(sessionToken)) {
-      throw new RuntimeException("Session not found");
+      throw new InvalidCredentialsException("Session not found");
     }
 
     sessionService.deleteSession(sessionToken);
   }
 
+  // ---------------------------------------------------------
+  // Me: get current user and person by session token
+  // ---------------------------------------------------------
   @Override
 public SessionResponseDTO me(String sessionToken) {
 

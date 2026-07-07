@@ -55,11 +55,17 @@ public class AuthApiNegIntegrLogoutTest {
     return user;
   }
 
+  // ---------------------------------------------------------
+  // Logout: missing tocken
+  // ---------------------------------------------------------
   @Test
   void testLogoutMissingToken() throws Exception {
     mockMvc.perform(post("/auth/logout")).andExpect(status().isBadRequest());
   }
 
+  // ---------------------------------------------------------
+  // Logout: invalid tocken
+  // ---------------------------------------------------------
   @Test
   void testLogoutInvalidToken() throws Exception {
     mockMvc
@@ -67,6 +73,9 @@ public class AuthApiNegIntegrLogoutTest {
         .andExpect(status().isUnauthorized());
   }
 
+  // ---------------------------------------------------------
+  // Logout: expired tocken
+  // ---------------------------------------------------------
   @Test
   void testLogoutExpiredToken() throws Exception {
     seedUser();
