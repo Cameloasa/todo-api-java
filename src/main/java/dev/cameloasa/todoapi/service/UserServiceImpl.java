@@ -7,6 +7,7 @@ import dev.cameloasa.todoapi.domanin.entity.Role;
 import dev.cameloasa.todoapi.domanin.entity.User;
 import dev.cameloasa.todoapi.exception.DataDuplicateException;
 import dev.cameloasa.todoapi.exception.DataNotFoundException;
+import dev.cameloasa.todoapi.repository.PersonRepository;
 import dev.cameloasa.todoapi.repository.RoleRepository;
 import dev.cameloasa.todoapi.repository.UserRepository;
 import java.util.Set;
@@ -20,16 +21,19 @@ public class UserServiceImpl implements UserService {
 
   private final UserRepository userRepository;
   private final RoleRepository roleRepository;
+  private final PersonRepository personRepository;
   private final PasswordEncoder passwordEncoder;
   private final UserConverter userConverter;
 
   public UserServiceImpl(
       UserRepository userRepository,
       RoleRepository roleRepository,
+      PersonRepository personRepository,
       PasswordEncoder passwordEncoder,
       UserConverter userConverter) {
     this.userRepository = userRepository;
     this.roleRepository = roleRepository;
+    this.personRepository = personRepository;
     this.passwordEncoder = passwordEncoder;
     this.userConverter = userConverter;
   }
@@ -157,6 +161,10 @@ public class UserServiceImpl implements UserService {
   @Transactional
   public void delete(String email) {
     validateEmailExists(email);
+    // delete person first
+    personRepository.deleteByUserEmail(email);
+
+    // delete user
     userRepository.deleteById(email);
   }
 

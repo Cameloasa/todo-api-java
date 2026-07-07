@@ -149,7 +149,7 @@ public class AuthServiceImpl implements AuthService {
   }
 
   // ---------------------------------------------------------
-  // Logout: 
+  // Logout:
   // ---------------------------------------------------------
   @SuppressWarnings("null")
   @Override
@@ -166,33 +166,36 @@ public class AuthServiceImpl implements AuthService {
   // Me: get current user and person by session token
   // ---------------------------------------------------------
   @Override
-public SessionResponseDTO me(String sessionToken) {
+  public SessionResponseDTO me(String sessionToken) {
 
     // 1. Validate token presence
     if (sessionToken == null || sessionToken.isBlank()) {
-        throw new IllegalArgumentException("Session token is required");
+      throw new IllegalArgumentException("Session token is required");
     }
 
     // 2. Fetch session object
-    SessionEntity session = sessionService
+    SessionEntity session =
+        sessionService
             .getSession(sessionToken)
             .orElseThrow(() -> new InvalidCredentialsException("Invalid session token"));
 
     // 3. Validate session (expired, revoked, etc.)
     if (!sessionService.isValid(sessionToken)) {
-        throw new InvalidCredentialsException("Session expired");
+      throw new InvalidCredentialsException("Session expired");
     }
 
     // 4. Extract email from session
     String email = session.getUserEmail();
 
     // 5. Fetch user
-    User user = userRepository
+    User user =
+        userRepository
             .findByEmail(email)
             .orElseThrow(() -> new DataNotFoundException("User not found"));
 
     // 6. Fetch person
-    Person person = personRepository
+    Person person =
+        personRepository
             .findByUserEmail(email)
             .orElseThrow(() -> new DataNotFoundException("Person not found"));
 
@@ -204,6 +207,5 @@ public SessionResponseDTO me(String sessionToken) {
     response.setSuccess(true);
 
     return response;
-}
-
+  }
 }

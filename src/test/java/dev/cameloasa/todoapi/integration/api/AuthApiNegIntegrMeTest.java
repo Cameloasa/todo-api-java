@@ -23,13 +23,17 @@ import org.springframework.test.web.servlet.MockMvc;
 @Transactional
 public class AuthApiNegIntegrMeTest {
 
-  @Autowired private MockMvc mockMvc;
+  @Autowired
+  private MockMvc mockMvc;
 
-  @Autowired private UserRepository userRepository;
+  @Autowired
+  private UserRepository userRepository;
 
-  @Autowired private PersonRepository personRepository;
+  @Autowired
+  private PersonRepository personRepository;
 
-  @Autowired private SessionRepository sessionRepository;
+  @Autowired
+  private SessionRepository sessionRepository;
 
   // Helper: seed user
   // ---------------------------------------------------------
@@ -37,7 +41,7 @@ public class AuthApiNegIntegrMeTest {
   // ---------------------------------------------------------
   // Helper: seed user
   // ---------------------------------------------------------
-  private User seedUser() {
+  private User seedUserAndPerson() {
     sessionRepository.deleteAll();
     personRepository.deleteAll();
     userRepository.deleteAll();
@@ -80,7 +84,7 @@ public class AuthApiNegIntegrMeTest {
   // ---------------------------------------------------------
   @Test
   void testMeExpiredToken() throws Exception {
-    seedUser();
+    seedUserAndPerson();
     LocalDateTime expiredAt = LocalDateTime.now().minusHours(1);
     long expiredMillis = expiredAt.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 

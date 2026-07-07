@@ -2,7 +2,6 @@ package dev.cameloasa.todoapi.auth.service;
 
 import dev.cameloasa.todoapi.auth.session.SessionEntity;
 import dev.cameloasa.todoapi.auth.session.SessionRepository;
-
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -45,5 +44,5 @@ public class SessionService {
 
   public Optional<SessionEntity> getSession(String token) {
     return sessionRepository.findByToken(token);
-}
+  }
 }

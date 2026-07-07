@@ -27,12 +27,17 @@ import org.springframework.test.web.servlet.MockMvc;
 @TestPropertySource("classpath:application-test.properties")
 public class AuthApiIntegrationTest {
 
-  @Autowired private MockMvc mockMvc;
-  @Autowired private UserRepository userRepository;
-  @Autowired private PersonRepository personRepository;
-  @Autowired private SessionRepository sessionRepository;
+  @Autowired
+  private MockMvc mockMvc;
+  @Autowired
+  private UserRepository userRepository;
+  @Autowired
+  private PersonRepository personRepository;
+  @Autowired
+  private SessionRepository sessionRepository;
 
-  @MockBean private EmailService emailService;
+  @MockBean
+  private EmailService emailService;
 
   // ---------------------------------------------------------
   // Helper: seed user
@@ -67,16 +72,15 @@ public class AuthApiIntegrationTest {
 
     when(emailService.sendRegistrationEmail(anyString())).thenReturn(HttpStatus.OK);
 
-    String json =
-        """
-            {
-                "firstName": "Camelia",
-                "lastName": "Test",
-                "email": "new@example.com",
-                "username": "newuser",
-                "password": "pass123"
-            }
-            """;
+    String json = """
+        {
+            "firstName": "Camelia",
+            "lastName": "Test",
+            "email": "new@example.com",
+            "username": "newuser",
+            "password": "pass123"
+        }
+        """;
 
     mockMvc
         .perform(post("/auth/register").contentType("application/json").content(json))
@@ -95,14 +99,13 @@ public class AuthApiIntegrationTest {
   void testLogin() throws Exception {
     seedUserAndPerson(); // user trebuie să existe
 
-    String json =
-        """
-            {
-                "username": "testuser",
-                "email": "test@example.com",
-                "password": "password123"
-            }
-            """;
+    String json = """
+        {
+            "username": "testuser",
+            "email": "test@example.com",
+            "password": "password123"
+        }
+        """;
 
     mockMvc
         .perform(post("/auth/login").contentType("application/json").content(json))

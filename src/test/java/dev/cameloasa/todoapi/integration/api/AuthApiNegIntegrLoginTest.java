@@ -20,23 +20,26 @@ import org.springframework.test.web.servlet.MockMvc;
 @Transactional
 public class AuthApiNegIntegrLoginTest {
 
-    @Autowired private MockMvc mockMvc;
+    @Autowired
+    private MockMvc mockMvc;
 
-    @Autowired private UserRepository userRepository;
+    @Autowired
+    private UserRepository userRepository;
 
-    @Autowired private PersonRepository personRepository;
+    @Autowired
+    private PersonRepository personRepository;
 
-    @Autowired private SessionRepository sessionRepository;
+    @Autowired
+    private SessionRepository sessionRepository;
 
     // ---------------------------------------------------------
     // TEST: login with wrong password
     // ---------------------------------------------------------
     @Test
     void testLoginWrongPassword() throws Exception {
-        seedUser();
+        seedUserAndPerson();
 
-        String json =
-            """
+        String json = """
                 {
                     "username": "testuser",
                     "email": "test@example.com",
@@ -45,8 +48,8 @@ public class AuthApiNegIntegrLoginTest {
                 """;
 
         mockMvc
-            .perform(post("/auth/login").contentType("application/json").content(json))
-            .andExpect(status().isUnauthorized());
+                .perform(post("/auth/login").contentType("application/json").content(json))
+                .andExpect(status().isUnauthorized());
     }
 
     // ---------------------------------------------------------
@@ -54,19 +57,18 @@ public class AuthApiNegIntegrLoginTest {
     // ---------------------------------------------------------
     @Test
     void testLoginWrongUsername() throws Exception {
-        seedUser();
+        seedUserAndPerson();
 
-        String json =
-            """
-            {
-                "username": "wronguser",
-                "password": "password123"
-            }
-            """;
+        String json = """
+                {
+                    "username": "wronguser",
+                    "password": "password123"
+                }
+                """;
 
         mockMvc
-            .perform(post("/auth/login").contentType("application/json").content(json))
-            .andExpect(status().isNotFound());
+                .perform(post("/auth/login").contentType("application/json").content(json))
+                .andExpect(status().isNotFound());
     }
 
     // ---------------------------------------------------------
@@ -74,20 +76,19 @@ public class AuthApiNegIntegrLoginTest {
     // ---------------------------------------------------------
     @Test
     void testLoginWrongEmail() throws Exception {
-        seedUser();
+        seedUserAndPerson();
 
-        String json =
-            """
-            {
-                "username": "testuser",
-                "email": "wrong@example.com",
-                "password": "password123"
-            }
-            """;
+        String json = """
+                {
+                    "username": "testuser",
+                    "email": "wrong@example.com",
+                    "password": "password123"
+                }
+                """;
 
         mockMvc
-            .perform(post("/auth/login").contentType("application/json").content(json))
-            .andExpect(status().isNotFound());
+                .perform(post("/auth/login").contentType("application/json").content(json))
+                .andExpect(status().isNotFound());
     }
 
     // ---------------------------------------------------------
@@ -95,18 +96,18 @@ public class AuthApiNegIntegrLoginTest {
     // ---------------------------------------------------------
     @Test
     void testLoginMissingEmail() throws Exception {
-        seedUser();
+        seedUserAndPerson();
 
         String json = """
-            {
+                {
 
-                "password": "password123"
-            }
-            """;
+                    "password": "password123"
+                }
+                """;
 
         mockMvc
-            .perform(post("/auth/login").contentType("application/json").content(json))
-            .andExpect(status().isBadRequest());
+                .perform(post("/auth/login").contentType("application/json").content(json))
+                .andExpect(status().isBadRequest());
     }
 
     // ---------------------------------------------------------
@@ -114,18 +115,18 @@ public class AuthApiNegIntegrLoginTest {
     // ---------------------------------------------------------
     @Test
     void testLoginMissingUsername() throws Exception {
-        seedUser();
+        seedUserAndPerson();
 
         String json = """
-            {
-                "email": "test@example.com",
+                {
+                    "email": "test@example.com",
 
-            }
-            """;
+                }
+                """;
 
         mockMvc
-            .perform(post("/auth/login").contentType("application/json").content(json))
-            .andExpect(status().isBadRequest());
+                .perform(post("/auth/login").contentType("application/json").content(json))
+                .andExpect(status().isBadRequest());
     }
 
     // ---------------------------------------------------------
@@ -133,24 +134,24 @@ public class AuthApiNegIntegrLoginTest {
     // ---------------------------------------------------------
     @Test
     void testLoginMissingPassword() throws Exception {
-        seedUser();
+        seedUserAndPerson();
 
         String json = """
-            {
+                {
 
-                "email": "test@example.com"
-            }
-            """;
+                    "email": "test@example.com"
+                }
+                """;
 
         mockMvc
-            .perform(post("/auth/login").contentType("application/json").content(json))
-            .andExpect(status().isBadRequest());
+                .perform(post("/auth/login").contentType("application/json").content(json))
+                .andExpect(status().isBadRequest());
     }
 
     // ---------------------------------------------------------
     // Helper: seed user
     // ---------------------------------------------------------
-    private User seedUser() {
+    private User seedUserAndPerson() {
         sessionRepository.deleteAll();
         personRepository.deleteAll();
         userRepository.deleteAll();
