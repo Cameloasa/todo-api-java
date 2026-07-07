@@ -4,6 +4,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import dev.cameloasa.todoapi.auth.session.SessionRepository;
+import dev.cameloasa.todoapi.domanin.entity.Person;
 import dev.cameloasa.todoapi.domanin.entity.User;
 import dev.cameloasa.todoapi.repository.PersonRepository;
 import dev.cameloasa.todoapi.repository.UserRepository;
@@ -61,13 +62,14 @@ public class AuthApiNegIntegrLoginTest {
             """
         {
             "username": "wronguser",
-            "email": "test@example.com",
             "password": "password123"
         }
         """;
 
         mockMvc
-            .perform(post("/auth/login").contentType("application/json").content(json))
+            .perform(post("/auth/login")
+            .contentType("application/json")
+            .content(json))
             .andExpect(status().isNotFound());
     }
 
@@ -102,7 +104,7 @@ public class AuthApiNegIntegrLoginTest {
         String json =
             """
         {
-            "username": "testuser",
+    
             "password": "password123"
         }
         """;
@@ -123,7 +125,7 @@ public class AuthApiNegIntegrLoginTest {
             """
         {
             "email": "test@example.com",
-            "password": "password123"
+    
         }
         """;
 
@@ -142,7 +144,7 @@ public class AuthApiNegIntegrLoginTest {
         String json =
             """
         {
-            "username": "testuser",
+        
             "email": "test@example.com"
         }
         """;
@@ -152,18 +154,27 @@ public class AuthApiNegIntegrLoginTest {
             .andExpect(status().isBadRequest());
     }
 
-  // Helper: seed user
-  // ---------------------------------------------------------
+    // ---------------------------------------------------------
+    // Helper: seed user
+    // ---------------------------------------------------------
     private User seedUser() {
-        // delete all existing users, persons, and sessions to ensure a clean state
-        sessionRepository.deleteAll();
-        personRepository.deleteAll();
-        userRepository.deleteAll();
+    sessionRepository.deleteAll();
+    personRepository.deleteAll();
+    userRepository.deleteAll();
 
-        User user = new User();
-        user.setEmail("test@example.com");
-        user.setUsername("testuser");
-        user.setPassword("password123");
-        return userRepository.save(user);
-    }
+    User user = new User();
+    user.setEmail("test@example.com");
+    user.setUsername("testuser");
+    user.setPassword("password123");
+    userRepository.save(user);
+
+    Person person = new Person();
+    person.setFirstName("Test");
+    person.setLastName("User");
+    person.setUser(user);
+    personRepository.save(person);
+
+    return user;
+}
+
 }

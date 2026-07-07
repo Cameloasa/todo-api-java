@@ -100,7 +100,7 @@ public class AuthServiceImpl implements AuthService {
       user =
           userRepository
               .findByEmail(dto.getEmail())
-              .orElseThrow(() -> new RuntimeException("Invalid email"));
+              .orElseThrow(() -> new DataNotFoundException("Invalid email"));
     }
 
     // login with username
@@ -108,12 +108,16 @@ public class AuthServiceImpl implements AuthService {
       user =
           userRepository
               .findByUsername(dto.getUsername())
-              .orElseThrow(() -> new RuntimeException("Invalid username"));
+              .orElseThrow(() -> new DataNotFoundException("Invalid username"));
     } else {
-      throw new RuntimeException("Email or username must be provided");
+      throw new IllegalArgumentException("Email or username must be provided");
     }
 
     // verify password
+
+    if (dto.getPassword() == null || dto.getPassword().isBlank()) {
+    throw new IllegalArgumentException("Password is required");
+}
     if (!user.getPassword().equals(dto.getPassword())) {
       throw new InvalidCredentialsException("Invalid password");
     }
@@ -125,7 +129,7 @@ public class AuthServiceImpl implements AuthService {
     Person person =
         personRepository
             .findByUserEmail(user.getEmail())
-            .orElseThrow(() -> new RuntimeException("Person not found for user"));
+            .orElseThrow(() -> new DataNotFoundException("Person not found for user"));
 
     // build response
     SessionResponseDTO response = new SessionResponseDTO();
