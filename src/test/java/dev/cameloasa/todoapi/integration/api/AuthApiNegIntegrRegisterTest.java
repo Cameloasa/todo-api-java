@@ -22,27 +22,27 @@ import org.springframework.test.web.servlet.MockMvc;
 @Transactional
 class AuthApiNegIntegrRegisterTest {
 
-    @Autowired private MockMvc mockMvc;
+  @Autowired private MockMvc mockMvc;
 
-    @Autowired private UserRepository userRepository;
+  @Autowired private UserRepository userRepository;
 
-    @MockBean private EmailService emailService;
+  @MockBean private EmailService emailService;
 
   // ---------------------------------------------------------
   // TEST: register email already exists
   // ---------------------------------------------------------
 
-    @Test
-    void testRegisterEmailAlreadyExists() throws Exception {
-        // seed user
-        User user = new User();
-        user.setEmail("existing@example.com");
-        user.setUsername("existinguser");
-        user.setPassword("pass123");
-        userRepository.save(user);
+  @Test
+  void testRegisterEmailAlreadyExists() throws Exception {
+    // seed user
+    User user = new User();
+    user.setEmail("existing@example.com");
+    user.setUsername("existinguser");
+    user.setPassword("pass123");
+    userRepository.save(user);
 
-        String json =
-            """
+    String json =
+        """
             {
                 "firstName": "Camelia",
                 "lastName": "Test",
@@ -52,24 +52,24 @@ class AuthApiNegIntegrRegisterTest {
             }
             """;
 
-        mockMvc
-            .perform(post("/auth/register").contentType("application/json").content(json))
-            .andExpect(status().isConflict());
-    }
+    mockMvc
+        .perform(post("/auth/register").contentType("application/json").content(json))
+        .andExpect(status().isConflict());
+  }
 
-    // ---------------------------------------------------------
-    // TEST: register username already exists
-    // ---------------------------------------------------------
-    @Test
-    void testRegisterUsernameAlreadyExists() throws Exception {
-        User user = new User();
-        user.setEmail("unique@example.com");
-        user.setUsername("existinguser");
-        user.setPassword("pass123");
-        userRepository.save(user);
+  // ---------------------------------------------------------
+  // TEST: register username already exists
+  // ---------------------------------------------------------
+  @Test
+  void testRegisterUsernameAlreadyExists() throws Exception {
+    User user = new User();
+    user.setEmail("unique@example.com");
+    user.setUsername("existinguser");
+    user.setPassword("pass123");
+    userRepository.save(user);
 
-        String json =
-            """
+    String json =
+        """
             {
                 "firstName": "Camelia",
                 "lastName": "Test",
@@ -79,20 +79,20 @@ class AuthApiNegIntegrRegisterTest {
             }
             """;
 
-        mockMvc
-            .perform(post("/auth/register").contentType("application/json").content(json))
-            .andExpect(status().isConflict());
-    }
+    mockMvc
+        .perform(post("/auth/register").contentType("application/json").content(json))
+        .andExpect(status().isConflict());
+  }
 
-    // ---------------------------------------------------------
-    // TEST: register invalid email
-    // ---------------------------------------------------------
-    @Test
-    void testRegisterInvalidEmail() throws Exception {
+  // ---------------------------------------------------------
+  // TEST: register invalid email
+  // ---------------------------------------------------------
+  @Test
+  void testRegisterInvalidEmail() throws Exception {
 
-        when(emailService.sendRegistrationEmail(anyString())).thenReturn(HttpStatus.OK);
-        String json =
-            """
+    when(emailService.sendRegistrationEmail(anyString())).thenReturn(HttpStatus.OK);
+    String json =
+        """
             {
                 "firstName": "Camelia",
                 "lastName": "Test",
@@ -102,20 +102,18 @@ class AuthApiNegIntegrRegisterTest {
             }
             """;
 
-        mockMvc
-            .perform(post("/auth/register")
-            .contentType("application/json")
-            .content(json))
-            .andExpect(status().isBadRequest());
-    }
+    mockMvc
+        .perform(post("/auth/register").contentType("application/json").content(json))
+        .andExpect(status().isBadRequest());
+  }
 
-    // ---------------------------------------------------------
-    // TEST: register missing fields
-    // ---------------------------------------------------------
-    @Test
-    void testRegisterMissingFields() throws Exception {
-        String json =
-            """
+  // ---------------------------------------------------------
+  // TEST: register missing fields
+  // ---------------------------------------------------------
+  @Test
+  void testRegisterMissingFields() throws Exception {
+    String json =
+        """
             {
                 "firstName": "",
                 "lastName": "",
@@ -125,8 +123,8 @@ class AuthApiNegIntegrRegisterTest {
             }
             """;
 
-        mockMvc
-            .perform(post("/auth/register").contentType("application/json").content(json))
-            .andExpect(status().isBadRequest());
-    }
+    mockMvc
+        .perform(post("/auth/register").contentType("application/json").content(json))
+        .andExpect(status().isBadRequest());
+  }
 }

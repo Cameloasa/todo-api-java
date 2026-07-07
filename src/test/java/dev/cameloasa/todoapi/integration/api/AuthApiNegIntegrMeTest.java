@@ -1,10 +1,7 @@
 package dev.cameloasa.todoapi.integration.api;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.web.servlet.MockMvc;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import dev.cameloasa.todoapi.auth.session.SessionEntity;
 import dev.cameloasa.todoapi.auth.session.SessionRepository;
@@ -13,34 +10,34 @@ import dev.cameloasa.todoapi.domanin.entity.User;
 import dev.cameloasa.todoapi.repository.PersonRepository;
 import dev.cameloasa.todoapi.repository.UserRepository;
 import jakarta.transaction.Transactional;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.web.servlet.MockMvc;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
 public class AuthApiNegIntegrMeTest {
-    
-    @Autowired private MockMvc mockMvc;
 
-    @Autowired private UserRepository userRepository;
+  @Autowired private MockMvc mockMvc;
 
-    @Autowired private PersonRepository personRepository;
+  @Autowired private UserRepository userRepository;
 
-    @Autowired private SessionRepository sessionRepository;
+  @Autowired private PersonRepository personRepository;
 
-    // Helper: seed user
+  @Autowired private SessionRepository sessionRepository;
+
+  // Helper: seed user
   // ---------------------------------------------------------
 
   // ---------------------------------------------------------
-    // Helper: seed user
-    // ---------------------------------------------------------
-    private User seedUser() {
+  // Helper: seed user
+  // ---------------------------------------------------------
+  private User seedUser() {
     sessionRepository.deleteAll();
     personRepository.deleteAll();
     userRepository.deleteAll();
@@ -58,31 +55,25 @@ public class AuthApiNegIntegrMeTest {
     personRepository.save(person);
 
     return user;
-}
+  }
 
-    @Test
-void testMeMissingToken() throws Exception {
-    mockMvc.perform(get("/auth/me"))
-        .andExpect(status().isBadRequest());
-}
+  @Test
+  void testMeMissingToken() throws Exception {
+    mockMvc.perform(get("/auth/me")).andExpect(status().isBadRequest());
+  }
 
-@Test
-void testMeInvalidToken() throws Exception {
-    mockMvc.perform(
-            get("/auth/me")
-                .header("X-Session-Token", "invalid-token")
-    )
-    .andExpect(status().isUnauthorized());
-}
+  @Test
+  void testMeInvalidToken() throws Exception {
+    mockMvc
+        .perform(get("/auth/me").header("X-Session-Token", "invalid-token"))
+        .andExpect(status().isUnauthorized());
+  }
 
-@Test
-void testMeExpiredToken() throws Exception {
+  @Test
+  void testMeExpiredToken() throws Exception {
     seedUser();
     LocalDateTime expiredAt = LocalDateTime.now().minusHours(1);
-long expiredMillis = expiredAt
-        .atZone(ZoneId.systemDefault())
-        .toInstant()
-        .toEpochMilli();
+    long expiredMillis = expiredAt.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 
     SessionEntity session = new SessionEntity();
     session.setToken("expired-token");
@@ -90,11 +81,8 @@ long expiredMillis = expiredAt
     session.setExpiresAt(expiredMillis); // expirat
     sessionRepository.save(session);
 
-    mockMvc.perform(
-            get("/auth/me")
-                .header("X-Session-Token", "expired-token")
-    )
-    .andExpect(status().isUnauthorized());
-}
-
+    mockMvc
+        .perform(get("/auth/me").header("X-Session-Token", "expired-token"))
+        .andExpect(status().isUnauthorized());
+  }
 }

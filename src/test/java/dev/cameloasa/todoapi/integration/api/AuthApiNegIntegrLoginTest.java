@@ -20,23 +20,23 @@ import org.springframework.test.web.servlet.MockMvc;
 @Transactional
 public class AuthApiNegIntegrLoginTest {
 
-    @Autowired private MockMvc mockMvc;
+  @Autowired private MockMvc mockMvc;
 
-    @Autowired private UserRepository userRepository;
+  @Autowired private UserRepository userRepository;
 
-    @Autowired private PersonRepository personRepository;
+  @Autowired private PersonRepository personRepository;
 
-    @Autowired private SessionRepository sessionRepository;
+  @Autowired private SessionRepository sessionRepository;
 
   // ---------------------------------------------------------
   // TEST: login with wrong password
   // ---------------------------------------------------------
-    @Test
-    void testLoginWrongPassword() throws Exception {
-        seedUser();
+  @Test
+  void testLoginWrongPassword() throws Exception {
+    seedUser();
 
-        String json =
-            """
+    String json =
+        """
             {
                 "username": "testuser",
                 "email": "test@example.com",
@@ -44,44 +44,40 @@ public class AuthApiNegIntegrLoginTest {
             }
             """;
 
-        mockMvc
-            .perform(post("/auth/login")
-            .contentType("application/json")
-            .content(json))
-            .andExpect(status().isUnauthorized());
-    }
+    mockMvc
+        .perform(post("/auth/login").contentType("application/json").content(json))
+        .andExpect(status().isUnauthorized());
+  }
 
   // ---------------------------------------------------------
   // TEST: login wrong username
   // ---------------------------------------------------------
-    @Test
-    void testLoginWrongUsername() throws Exception {
-        seedUser();
+  @Test
+  void testLoginWrongUsername() throws Exception {
+    seedUser();
 
-        String json =
-            """
+    String json =
+        """
         {
             "username": "wronguser",
             "password": "password123"
         }
         """;
 
-        mockMvc
-            .perform(post("/auth/login")
-            .contentType("application/json")
-            .content(json))
-            .andExpect(status().isNotFound());
-    }
+    mockMvc
+        .perform(post("/auth/login").contentType("application/json").content(json))
+        .andExpect(status().isNotFound());
+  }
 
   // ---------------------------------------------------------
   // TEST: login wrong email
   // ---------------------------------------------------------
-    @Test
-    void testLoginWrongEmail() throws Exception {
-        seedUser();
+  @Test
+  void testLoginWrongEmail() throws Exception {
+    seedUser();
 
-        String json =
-            """
+    String json =
+        """
         {
             "username": "testuser",
             "email": "wrong@example.com",
@@ -89,75 +85,72 @@ public class AuthApiNegIntegrLoginTest {
         }
         """;
 
-        mockMvc
-            .perform(post("/auth/login").contentType("application/json").content(json))
-            .andExpect(status().isNotFound());
-    }
+    mockMvc
+        .perform(post("/auth/login").contentType("application/json").content(json))
+        .andExpect(status().isNotFound());
+  }
 
   // ---------------------------------------------------------
   // TEST: login missing email
   // ---------------------------------------------------------
-    @Test
-    void testLoginMissingEmail() throws Exception {
-        seedUser();
+  @Test
+  void testLoginMissingEmail() throws Exception {
+    seedUser();
 
-        String json =
-            """
+    String json = """
         {
-    
+
             "password": "password123"
         }
         """;
 
-        mockMvc
-            .perform(post("/auth/login").contentType("application/json").content(json))
-            .andExpect(status().isBadRequest());
-    }
+    mockMvc
+        .perform(post("/auth/login").contentType("application/json").content(json))
+        .andExpect(status().isBadRequest());
+  }
 
   // ---------------------------------------------------------
   // TEST: login missing username
   // ---------------------------------------------------------
-    @Test
-    void testLoginMissingUsername() throws Exception {
-        seedUser();
+  @Test
+  void testLoginMissingUsername() throws Exception {
+    seedUser();
 
-        String json =
-            """
+    String json = """
         {
             "email": "test@example.com",
-    
+
         }
         """;
 
-        mockMvc
-            .perform(post("/auth/login").contentType("application/json").content(json))
-            .andExpect(status().isBadRequest());
-    }
+    mockMvc
+        .perform(post("/auth/login").contentType("application/json").content(json))
+        .andExpect(status().isBadRequest());
+  }
 
   // ---------------------------------------------------------
   // TEST: login missing password
   // ---------------------------------------------------------
-    @Test
-    void testLoginMissingPassword() throws Exception {
-        seedUser();
+  @Test
+  void testLoginMissingPassword() throws Exception {
+    seedUser();
 
-        String json =
-            """
+    String json = """
         {
-        
+
             "email": "test@example.com"
         }
         """;
 
-        mockMvc
-            .perform(post("/auth/login").contentType("application/json").content(json))
-            .andExpect(status().isBadRequest());
-    }
+    mockMvc
+        .perform(post("/auth/login").contentType("application/json").content(json))
+        .andExpect(status().isBadRequest());
+  }
 
-    // ---------------------------------------------------------
-    // Helper: seed user
-    // ---------------------------------------------------------
-    private User seedUser() {
+  // ---------------------------------------------------------
+  // Helper: seed user
+  // ---------------------------------------------------------
+  private User seedUser() {
     sessionRepository.deleteAll();
     personRepository.deleteAll();
     userRepository.deleteAll();
@@ -175,6 +168,5 @@ public class AuthApiNegIntegrLoginTest {
     personRepository.save(person);
 
     return user;
-}
-
+  }
 }

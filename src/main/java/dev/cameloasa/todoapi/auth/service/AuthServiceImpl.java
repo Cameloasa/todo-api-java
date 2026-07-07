@@ -116,8 +116,8 @@ public class AuthServiceImpl implements AuthService {
     // verify password
 
     if (dto.getPassword() == null || dto.getPassword().isBlank()) {
-    throw new IllegalArgumentException("Password is required");
-}
+      throw new IllegalArgumentException("Password is required");
+    }
     if (!user.getPassword().equals(dto.getPassword())) {
       throw new InvalidCredentialsException("Invalid password");
     }
