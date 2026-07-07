@@ -57,11 +57,17 @@ public class AuthApiNegIntegrMeTest {
     return user;
   }
 
+  // ---------------------------------------------------------
+  // TEST: me missing token
+  // ---------------------------------------------------------
   @Test
   void testMeMissingToken() throws Exception {
     mockMvc.perform(get("/auth/me")).andExpect(status().isBadRequest());
   }
 
+  // ---------------------------------------------------------
+  // TEST: me invalid token
+  // ---------------------------------------------------------
   @Test
   void testMeInvalidToken() throws Exception {
     mockMvc
@@ -69,6 +75,9 @@ public class AuthApiNegIntegrMeTest {
         .andExpect(status().isUnauthorized());
   }
 
+  // ---------------------------------------------------------
+  // TEST: me expired token
+  // ---------------------------------------------------------
   @Test
   void testMeExpiredToken() throws Exception {
     seedUser();

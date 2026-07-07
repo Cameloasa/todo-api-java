@@ -1,5 +1,7 @@
 package dev.cameloasa.todoapi.auth.session;
 
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface SessionRepository extends JpaRepository<SessionEntity, String> {
@@ -8,5 +10,5 @@ public interface SessionRepository extends JpaRepository<SessionEntity, String> 
 
   boolean existsByToken(String token);
 
-  SessionEntity findByToken(String token);
+  Optional<SessionEntity> findByToken(String token);
 }

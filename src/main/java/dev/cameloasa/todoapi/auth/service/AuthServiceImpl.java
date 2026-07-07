@@ -4,6 +4,7 @@ import dev.cameloasa.todoapi.auth.dto.LoginDTOForm;
 import dev.cameloasa.todoapi.auth.dto.RegisterDTOForm;
 import dev.cameloasa.todoapi.auth.dto.RegisterDTOView;
 import dev.cameloasa.todoapi.auth.dto.SessionResponseDTO;
+import dev.cameloasa.todoapi.auth.session.SessionEntity;
 import dev.cameloasa.todoapi.converter.PersonConverter;
 import dev.cameloasa.todoapi.converter.UserConverter;
 import dev.cameloasa.todoapi.domanin.entity.Person;
@@ -153,23 +154,37 @@ public class AuthServiceImpl implements AuthService {
   }
 
   @Override
-  public SessionResponseDTO me(String sessionToken) {
+public SessionResponseDTO me(String sessionToken) {
 
-    if (!sessionService.isValid(sessionToken)) {
-      throw new RuntimeException("Session expired or invalid");
+    // 1. Validate token presence
+    if (sessionToken == null || sessionToken.isBlank()) {
+        throw new IllegalArgumentException("Session token is required");
     }
 
-    String email = sessionService.getUserEmail(sessionToken);
+    // 2. Fetch session object
+    SessionEntity session = sessionService
+            .getSession(sessionToken)
+            .orElseThrow(() -> new InvalidCredentialsException("Invalid session token"));
 
-    User user =
-        userRepository
+    // 3. Validate session (expired, revoked, etc.)
+    if (!sessionService.isValid(sessionToken)) {
+        throw new InvalidCredentialsException("Session expired");
+    }
+
+    // 4. Extract email from session
+    String email = session.getUserEmail();
+
+    // 5. Fetch user
+    User user = userRepository
             .findByEmail(email)
             .orElseThrow(() -> new DataNotFoundException("User not found"));
-    Person person =
-        personRepository
+
+    // 6. Fetch person
+    Person person = personRepository
             .findByUserEmail(email)
             .orElseThrow(() -> new DataNotFoundException("Person not found"));
 
+    // 7. Build response
     SessionResponseDTO response = new SessionResponseDTO();
     response.setSessionToken(sessionToken);
     response.setUser(userConverter.toUserDTOView(user));
@@ -177,5 +192,6 @@ public class AuthServiceImpl implements AuthService {
     response.setSuccess(true);
 
     return response;
-  }
+}
+
 }
