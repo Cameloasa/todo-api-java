@@ -20,5 +20,4 @@ public class LoginDTOForm {
 
   @NotBlank(message = "Password is required")
   private String password;
-
 }

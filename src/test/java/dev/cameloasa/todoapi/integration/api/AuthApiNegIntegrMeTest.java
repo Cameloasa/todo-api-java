@@ -4,7 +4,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import dev.cameloasa.todoapi.auth.session.SessionEntity;
-
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import org.junit.jupiter.api.Test;
@@ -14,11 +13,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
-
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestPropertySource("classpath:application-test.properties")
-public class AuthApiNegIntegrMeTest extends IntegrationTestBase{
+public class AuthApiNegIntegrMeTest extends IntegrationTestBase {
 
   @Autowired private MockMvc mockMvc;
 

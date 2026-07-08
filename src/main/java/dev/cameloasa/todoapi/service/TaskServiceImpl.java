@@ -192,8 +192,8 @@ public class TaskServiceImpl implements TaskService {
             .findById(taskId)
             .orElseThrow(() -> new DataNotFoundException("Task not found"));
 
-    //task.setPerson(null);
-    //taskRepository.save(task);
+    // task.setPerson(null);
+    // taskRepository.save(task);
 
     return taskConverter.toTaskDTOView(task);
   }

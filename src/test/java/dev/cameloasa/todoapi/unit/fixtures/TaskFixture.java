@@ -15,24 +15,21 @@ public class TaskFixture {
     return task;
   }
 
-
-    public static TaskDTOView sampleTaskDTOView() {
-        return TaskDTOView.builder()
-                .id(10L)
-                .title("Test Task")
-                .description("Fixture task description")
-                .done(false)
-                .build();
-    }
-
-    public static TaskDTOForm sampleTaskDTOForm() {
-        TaskDTOForm dto = new TaskDTOForm();
-        dto.setId(10L);
-        dto.setTitle("Test Task");
-        dto.setDescription("Fixture task description");
-        dto.setDone(false);
-        return dto;
-    }
-
+  public static TaskDTOView sampleTaskDTOView() {
+    return TaskDTOView.builder()
+        .id(10L)
+        .title("Test Task")
+        .description("Fixture task description")
+        .done(false)
+        .build();
   }
 
+  public static TaskDTOForm sampleTaskDTOForm() {
+    TaskDTOForm dto = new TaskDTOForm();
+    dto.setId(10L);
+    dto.setTitle("Test Task");
+    dto.setDescription("Fixture task description");
+    dto.setDone(false);
+    return dto;
+  }
+}

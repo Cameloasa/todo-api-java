@@ -3,13 +3,10 @@ package dev.cameloasa.todoapi.converter;
 import dev.cameloasa.todoapi.domanin.dto.TaskDTOForm;
 import dev.cameloasa.todoapi.domanin.dto.TaskDTOView;
 import dev.cameloasa.todoapi.domanin.entity.Task;
-
 import org.springframework.stereotype.Component;
 
 @Component
 public class TaskConverterImpl implements TaskConverter {
-
-
 
   @Override
   public TaskDTOView toTaskDTOView(Task entity) {

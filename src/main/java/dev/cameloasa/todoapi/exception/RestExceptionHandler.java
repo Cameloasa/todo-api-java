@@ -141,7 +141,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
   // ---------------------------------------------------------
   @ExceptionHandler(EmailServiceFailedException.class)
   public ResponseEntity<ErrorDTO> handleEmailFailure(
-    EmailServiceFailedException ex, WebRequest request) {
+      EmailServiceFailedException ex, WebRequest request) {
 
     HttpServletRequest servletRequest = ((ServletWebRequest) request).getRequest();
 
@@ -153,6 +153,5 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             servletRequest.getMethod());
 
     return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(body);
-}
-
+  }
 }

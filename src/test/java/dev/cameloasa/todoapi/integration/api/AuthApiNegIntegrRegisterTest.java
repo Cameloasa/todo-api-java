@@ -6,21 +6,20 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import dev.cameloasa.todoapi.service.EmailService;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.http.MediaType;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestPropertySource("classpath:application-test.properties")
-class AuthApiNegIntegrRegisterTest extends IntegrationTestBase{
+class AuthApiNegIntegrRegisterTest extends IntegrationTestBase {
 
   @Autowired private MockMvc mockMvc;
 
@@ -31,12 +30,13 @@ class AuthApiNegIntegrRegisterTest extends IntegrationTestBase{
   // ---------------------------------------------------------
 
   @SuppressWarnings("null")
-@Test
-void testRegisterEmailAlreadyExists() throws Exception {
+  @Test
+  void testRegisterEmailAlreadyExists() throws Exception {
 
     seedUserAndPerson(); // email = test@example.com
 
-    String json = """
+    String json =
+        """
     {
         "firstName": "Test",
         "lastName": "Person",
@@ -46,23 +46,22 @@ void testRegisterEmailAlreadyExists() throws Exception {
     }
     """;
 
-    mockMvc.perform(post("/auth/register")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(json))
+    mockMvc
+        .perform(post("/auth/register").contentType(MediaType.APPLICATION_JSON).content(json))
         .andExpect(status().isConflict());
-}
-
+  }
 
   // ---------------------------------------------------------
   // TEST: register username already exists
   // ---------------------------------------------------------
   @SuppressWarnings("null")
-@Test
-void testRegisterUsernameAlreadyExists() throws Exception {
+  @Test
+  void testRegisterUsernameAlreadyExists() throws Exception {
 
     seedUserAndPerson(); // username = test
 
-    String json = """
+    String json =
+        """
     {
         "firstName": "Camelia",
         "lastName": "Test",
@@ -72,24 +71,22 @@ void testRegisterUsernameAlreadyExists() throws Exception {
     }
     """;
 
-    mockMvc.perform(post("/auth/register")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(json))
+    mockMvc
+        .perform(post("/auth/register").contentType(MediaType.APPLICATION_JSON).content(json))
         .andExpect(status().isConflict());
-}
-
+  }
 
   // ---------------------------------------------------------
   // TEST: register invalid email
   // ---------------------------------------------------------
   @SuppressWarnings("null")
-@Test
-void testRegisterInvalidEmail() throws Exception {
+  @Test
+  void testRegisterInvalidEmail() throws Exception {
 
-    when(emailService.sendRegistrationEmail(anyString()))
-        .thenReturn(HttpStatus.OK);
+    when(emailService.sendRegistrationEmail(anyString())).thenReturn(HttpStatus.OK);
 
-    String json = """
+    String json =
+        """
     {
         "firstName": "Camelia",
         "lastName": "Test",
@@ -99,20 +96,20 @@ void testRegisterInvalidEmail() throws Exception {
     }
     """;
 
-    mockMvc.perform(post("/auth/register")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(json))
+    mockMvc
+        .perform(post("/auth/register").contentType(MediaType.APPLICATION_JSON).content(json))
         .andExpect(status().isBadRequest());
-}
+  }
 
   // ---------------------------------------------------------
   // TEST: register missing fields
   // ---------------------------------------------------------
   @SuppressWarnings("null")
-@Test
-void testRegisterMissingFields() throws Exception {
+  @Test
+  void testRegisterMissingFields() throws Exception {
 
-    String json = """
+    String json =
+        """
     {
         "firstName": "",
         "lastName": "",
@@ -122,10 +119,8 @@ void testRegisterMissingFields() throws Exception {
     }
     """;
 
-    mockMvc.perform(post("/auth/register")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(json))
+    mockMvc
+        .perform(post("/auth/register").contentType(MediaType.APPLICATION_JSON).content(json))
         .andExpect(status().isBadRequest());
-}
-
+  }
 }

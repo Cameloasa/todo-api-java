@@ -14,16 +14,13 @@ public class RoleFixture {
   }
 
   public static RoleDTOView sampleRoleDTOView() {
-        return RoleDTOView.builder()
-                .id(1L)
-                .name("USER")
-                .build();
-    }
+    return RoleDTOView.builder().id(1L).name("USER").build();
+  }
 
   public static RoleDTOForm sampleRoleForm() {
-        RoleDTOForm dto = new RoleDTOForm();
-        dto.setId(1L);
-        dto.setName("USER");
-        return dto;
-    }
+    RoleDTOForm dto = new RoleDTOForm();
+    dto.setId(1L);
+    dto.setName("USER");
+    return dto;
+  }
 }

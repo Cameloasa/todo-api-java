@@ -20,6 +20,8 @@ import dev.cameloasa.todoapi.repository.UserRepository;
 import dev.cameloasa.todoapi.service.EmailService;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -30,6 +32,8 @@ public class AuthServiceImpl implements AuthService {
   private final PersonRepository personRepository;
   private final SessionService sessionService;
   private final RoleRepository roleRepository;
+
+  private final PasswordEncoder passwordEncoder;
 
   private final UserConverter userConverter;
   private final PersonConverter personConverter;
@@ -125,7 +129,7 @@ public class AuthServiceImpl implements AuthService {
     if (dto.getPassword() == null || dto.getPassword().isBlank()) {
       throw new IllegalArgumentException("Password is required");
     }
-    if (!user.getPassword().equals(dto.getPassword())) {
+    if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
       throw new InvalidCredentialsException("Invalid password");
     }
 

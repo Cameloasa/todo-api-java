@@ -2,7 +2,6 @@ package dev.cameloasa.todoapi.domanin.dto;
 
 import jakarta.validation.constraints.*;
 import java.util.List;
-
 import lombok.*;
 
 @Getter

@@ -4,6 +4,7 @@ import dev.cameloasa.todoapi.domanin.dto.RoleDTOForm;
 import dev.cameloasa.todoapi.domanin.dto.RoleDTOView;
 import dev.cameloasa.todoapi.domanin.entity.Role;
 import org.springframework.stereotype.Component;
+
 @Component
 public class RoleConverterImpl implements RoleConverter {
 
@@ -21,4 +22,3 @@ public class RoleConverterImpl implements RoleConverter {
     return Role.builder().id(dto.getId()).name(dto.getName()).build();
   }
 }
-

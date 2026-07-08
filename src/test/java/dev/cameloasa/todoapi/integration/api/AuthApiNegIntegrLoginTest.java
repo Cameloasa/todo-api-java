@@ -1,18 +1,16 @@
 package dev.cameloasa.todoapi.integration.api;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
-
-import org.springframework.http.MediaType;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -21,14 +19,13 @@ public class AuthApiNegIntegrLoginTest extends IntegrationTestBase {
 
   @Autowired private MockMvc mockMvc;
 
-
   // ---------------------------------------------------------
   // TEST: login with wrong password
   // ---------------------------------------------------------
   @SuppressWarnings("null")
-@Test
+  @Test
   void testLoginWrongPassword() throws Exception {
-    
+
     createUser("test@example.com");
     String json =
         """
@@ -49,9 +46,9 @@ public class AuthApiNegIntegrLoginTest extends IntegrationTestBase {
   // TEST: login wrong username
   // ---------------------------------------------------------
   @SuppressWarnings("null")
-@Test
+  @Test
   void testLoginWrongUsername() throws Exception {
-    
+
     createUser("test@example.com");
     String json =
         """
@@ -71,9 +68,9 @@ public class AuthApiNegIntegrLoginTest extends IntegrationTestBase {
   // TEST: login wrong email
   // ---------------------------------------------------------
   @SuppressWarnings("null")
-@Test
+  @Test
   void testLoginWrongEmail() throws Exception {
-    
+
     createUser("test@example.com");
     String json =
         """
@@ -94,9 +91,9 @@ public class AuthApiNegIntegrLoginTest extends IntegrationTestBase {
   // TEST: login missing email
   // ---------------------------------------------------------
   @SuppressWarnings("null")
-@Test
+  @Test
   void testLoginMissingEmail() throws Exception {
-    
+
     createUser("test@example.com");
 
     String json =
@@ -117,9 +114,9 @@ public class AuthApiNegIntegrLoginTest extends IntegrationTestBase {
   // TEST: login missing username
   // ---------------------------------------------------------
   @SuppressWarnings("null")
-@Test
+  @Test
   void testLoginMissingUsername() throws Exception {
-    
+
     createUser("test@example.com");
     String json =
         """
@@ -139,9 +136,9 @@ public class AuthApiNegIntegrLoginTest extends IntegrationTestBase {
   // TEST: login missing password
   // ---------------------------------------------------------
   @SuppressWarnings("null")
-@Test
+  @Test
   void testLoginMissingPassword() throws Exception {
-    
+
     createUser("test@example.com");
     String json =
         """
@@ -156,6 +153,4 @@ public class AuthApiNegIntegrLoginTest extends IntegrationTestBase {
         .andDo(print())
         .andExpect(status().isBadRequest());
   }
-
-  
 }
