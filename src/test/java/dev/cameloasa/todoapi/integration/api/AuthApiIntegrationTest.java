@@ -6,9 +6,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import dev.cameloasa.todoapi.auth.session.SessionEntity;
-import dev.cameloasa.todoapi.domanin.entity.User;
-import dev.cameloasa.todoapi.fixtures.SessionFixture;
+
 import dev.cameloasa.todoapi.service.EmailService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +16,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.http.MediaType;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -32,91 +32,171 @@ public class AuthApiIntegrationTest extends IntegrationTestBase {
   // ---------------------------------------------------------
   // TEST 1: register
   // ---------------------------------------------------------
-  @Test
-  void testRegister() throws Exception {
+  @SuppressWarnings("null")
+@Test
+void testRegister() throws Exception {
 
     when(emailService.sendRegistrationEmail(anyString())).thenReturn(HttpStatus.OK);
 
-    String json =
-        """
+    String json = """
         {
             "firstName": "Test",
             "lastName": "Person",
             "email": "test@example.com",
-            "username": "testuser",
+            "username": "test",
             "password": "Password123!"
         }
-        """;
+    """;
 
-    mockMvc
-        .perform(post("/auth/register").contentType("application/json").content(json))
+    mockMvc.perform(post("/auth/register")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(json))
+        .andDo(print())
         .andExpect(status().isCreated())
-        .andExpect(jsonPath("$.user.username").value("testuser"))
+        .andExpect(jsonPath("$.user.username").value("test"))
         .andExpect(jsonPath("$.user.email").value("test@example.com"))
         .andExpect(jsonPath("$.person.firstName").value("Test"))
         .andExpect(jsonPath("$.person.lastName").value("Person"))
         .andExpect(jsonPath("$.success").value(true));
-  }
+}
 
   // ---------------------------------------------------------
   // TEST 2: login
   // ---------------------------------------------------------
-  @Test
-  void testLogin() throws Exception {
-  
-    String json =
-        """
+  @SuppressWarnings("null")
+@Test
+void testLogin() throws Exception {
+
+    when(emailService.sendRegistrationEmail(anyString())).thenReturn(HttpStatus.OK);
+
+    // 1. Register
+    String registerJson = """
         {
-            "username": "testuser",
+            "firstName": "Test",
+            "lastName": "Person",
+            "email": "test@example.com",
+            "username": "test",
+            "password": "Password123!"
+        }
+    """;
+
+    mockMvc.perform(post("/auth/register")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(registerJson))
+        .andExpect(status().isCreated());
+
+    // 2. Login
+    String loginJson = """
+        {
             "email": "test@example.com",
             "password": "Password123!"
         }
-        """;
+    """;
 
-    mockMvc
-        .perform(post("/auth/login").contentType("application/json").content(json))
-        .andDo(print())
+    mockMvc.perform(post("/auth/login")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(loginJson))
         .andExpect(status().isOk())
         .andExpect(cookie().exists("session_token"));
-  }
+}
 
   // ---------------------------------------------------------
   // TEST 3: me (requires session)
   // ---------------------------------------------------------
   @SuppressWarnings("null")
   @Test
-  void testMe() throws Exception {
-    User user = createUser("test@example.com");
-    
+void testMe() throws Exception {
 
-    SessionEntity session = SessionFixture.sampleSession(user);
-    sessionRepository.save(session);
+    when(emailService.sendRegistrationEmail(anyString())).thenReturn(HttpStatus.OK);
 
-    mockMvc
-        .perform(get("/auth/me").header("X-Session-Token", session.getToken()))
-        .andDo(print())
+    // 1. Register
+    String registerJson = """
+        {
+            "firstName": "Test",
+            "lastName": "Person",
+            "email": "test@example.com",
+            "username": "test",
+            "password": "Password123!"
+        }
+    """;
+
+    mockMvc.perform(post("/auth/register")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(registerJson))
+        .andExpect(status().isCreated());
+
+    // 2. Login
+    String loginJson = """
+        {
+            "email": "test@example.com",
+            "password": "Password123!"
+        }
+    """;
+
+    MvcResult result = mockMvc.perform(post("/auth/login")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(loginJson))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.user.username").value("testuser"))
+        .andReturn();
+
+    String token = result.getResponse().getCookie("session_token").getValue();
+
+    // 3. Me
+    mockMvc.perform(get("/auth/me")
+            .header("X-Session-Token", token))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.user.username").value("test"))
         .andExpect(jsonPath("$.user.email").value("test@example.com"))
         .andExpect(jsonPath("$.person.firstName").value("Test"))
         .andExpect(jsonPath("$.person.lastName").value("Person"))
         .andExpect(jsonPath("$.success").value(true));
-  }
+}
 
   // ---------------------------------------------------------
   // TEST 4: logout
   // ---------------------------------------------------------
   @SuppressWarnings("null")
   @Test
-  void testLogout() throws Exception {
-    User user = createUser("test@example.com");
-    
+void testLogout() throws Exception {
 
-    SessionEntity session = SessionFixture.sampleSession(user);
-    sessionRepository.save(session);
+    when(emailService.sendRegistrationEmail(anyString())).thenReturn(HttpStatus.OK);
 
-    mockMvc
-        .perform(post("/auth/logout").header("X-Session-Token", session.getToken()))
+    // 1. Register
+    String registerJson = """
+        {
+            "firstName": "Test",
+            "lastName": "Person",
+            "email": "test@example.com",
+            "username": "test",
+            "password": "Password123!"
+        }
+    """;
+
+    mockMvc.perform(post("/auth/register")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(registerJson))
+        .andExpect(status().isCreated());
+
+    // 2. Login
+    String loginJson = """
+        {
+            "email": "test@example.com",
+            "password": "Password123!"
+        }
+    """;
+
+    MvcResult result = mockMvc.perform(post("/auth/login")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(loginJson))
+        .andExpect(status().isOk())
+        .andReturn();
+
+    String token = result.getResponse().getCookie("session_token").getValue();
+
+    // 3. Logout
+    mockMvc.perform(post("/auth/logout")
+            .header("X-Session-Token", token))
         .andExpect(status().isOk());
-  }
+}
+
 }

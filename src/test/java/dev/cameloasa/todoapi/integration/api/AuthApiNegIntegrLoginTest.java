@@ -2,39 +2,34 @@ package dev.cameloasa.todoapi.integration.api;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
-import dev.cameloasa.todoapi.auth.session.SessionRepository;
-import dev.cameloasa.todoapi.domanin.entity.Person;
-import dev.cameloasa.todoapi.domanin.entity.User;
-import dev.cameloasa.todoapi.repository.PersonRepository;
-import dev.cameloasa.todoapi.repository.UserRepository;
-import jakarta.transaction.Transactional;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
+
+import org.springframework.http.MediaType;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@Transactional
-public class AuthApiNegIntegrLoginTest {
+@TestPropertySource("classpath:application-test.properties")
+public class AuthApiNegIntegrLoginTest extends IntegrationTestBase {
 
   @Autowired private MockMvc mockMvc;
 
-  @Autowired private UserRepository userRepository;
-
-  @Autowired private PersonRepository personRepository;
-
-  @Autowired private SessionRepository sessionRepository;
 
   // ---------------------------------------------------------
   // TEST: login with wrong password
   // ---------------------------------------------------------
-  @Test
+  @SuppressWarnings("null")
+@Test
   void testLoginWrongPassword() throws Exception {
-    seedUserAndPerson();
-
+    
+    createUser("test@example.com");
     String json =
         """
                 {
@@ -45,78 +40,87 @@ public class AuthApiNegIntegrLoginTest {
                 """;
 
     mockMvc
-        .perform(post("/auth/login").contentType("application/json").content(json))
+        .perform(post("/auth/login").contentType(MediaType.APPLICATION_JSON).content(json))
+        .andDo(print())
         .andExpect(status().isUnauthorized());
   }
 
   // ---------------------------------------------------------
   // TEST: login wrong username
   // ---------------------------------------------------------
-  @Test
+  @SuppressWarnings("null")
+@Test
   void testLoginWrongUsername() throws Exception {
-    seedUserAndPerson();
-
+    
+    createUser("test@example.com");
     String json =
         """
                 {
                     "username": "wronguser",
-                    "password": "password123"
+                    "password": "Password123!"
                 }
                 """;
 
     mockMvc
-        .perform(post("/auth/login").contentType("application/json").content(json))
+        .perform(post("/auth/login").contentType(MediaType.APPLICATION_JSON).content(json))
+        .andDo(print())
         .andExpect(status().isNotFound());
   }
 
   // ---------------------------------------------------------
   // TEST: login wrong email
   // ---------------------------------------------------------
-  @Test
+  @SuppressWarnings("null")
+@Test
   void testLoginWrongEmail() throws Exception {
-    seedUserAndPerson();
-
+    
+    createUser("test@example.com");
     String json =
         """
                 {
-                    "username": "testuser",
+                    "username": "test",
                     "email": "wrong@example.com",
-                    "password": "password123"
+                    "password": "Password123!"
                 }
                 """;
 
     mockMvc
-        .perform(post("/auth/login").contentType("application/json").content(json))
+        .perform(post("/auth/login").contentType(MediaType.APPLICATION_JSON).content(json))
+        .andDo(print())
         .andExpect(status().isNotFound());
   }
 
   // ---------------------------------------------------------
   // TEST: login missing email
   // ---------------------------------------------------------
-  @Test
+  @SuppressWarnings("null")
+@Test
   void testLoginMissingEmail() throws Exception {
-    seedUserAndPerson();
+    
+    createUser("test@example.com");
 
     String json =
         """
                 {
 
-                    "password": "password123"
+                    "password": "Password123!"
                 }
                 """;
 
     mockMvc
-        .perform(post("/auth/login").contentType("application/json").content(json))
+        .perform(post("/auth/login").contentType(MediaType.APPLICATION_JSON).content(json))
+        .andDo(print())
         .andExpect(status().isBadRequest());
   }
 
   // ---------------------------------------------------------
   // TEST: login missing username
   // ---------------------------------------------------------
-  @Test
+  @SuppressWarnings("null")
+@Test
   void testLoginMissingUsername() throws Exception {
-    seedUserAndPerson();
-
+    
+    createUser("test@example.com");
     String json =
         """
                 {
@@ -126,17 +130,19 @@ public class AuthApiNegIntegrLoginTest {
                 """;
 
     mockMvc
-        .perform(post("/auth/login").contentType("application/json").content(json))
+        .perform(post("/auth/login").contentType(MediaType.APPLICATION_JSON).content(json))
+        .andDo(print())
         .andExpect(status().isBadRequest());
   }
 
   // ---------------------------------------------------------
   // TEST: login missing password
   // ---------------------------------------------------------
-  @Test
+  @SuppressWarnings("null")
+@Test
   void testLoginMissingPassword() throws Exception {
-    seedUserAndPerson();
-
+    
+    createUser("test@example.com");
     String json =
         """
                 {
@@ -146,30 +152,10 @@ public class AuthApiNegIntegrLoginTest {
                 """;
 
     mockMvc
-        .perform(post("/auth/login").contentType("application/json").content(json))
+        .perform(post("/auth/login").contentType(MediaType.APPLICATION_JSON).content(json))
+        .andDo(print())
         .andExpect(status().isBadRequest());
   }
 
-  // ---------------------------------------------------------
-  // Helper: seed user
-  // ---------------------------------------------------------
-  private User seedUserAndPerson() {
-    sessionRepository.deleteAll();
-    personRepository.deleteAll();
-    userRepository.deleteAll();
-
-    User user = new User();
-    user.setEmail("test@example.com");
-    user.setUsername("testuser");
-    user.setPassword("password123");
-    userRepository.save(user);
-
-    Person person = new Person();
-    person.setFirstName("Test");
-    person.setLastName("User");
-    person.setUser(user);
-    personRepository.save(person);
-
-    return user;
-  }
+  
 }

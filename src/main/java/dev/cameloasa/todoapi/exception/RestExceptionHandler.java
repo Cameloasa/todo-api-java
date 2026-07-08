@@ -135,4 +135,24 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
   }
+
+  // ---------------------------------------------------------
+  // 7/. 500 Internal Server Error (fallback)
+  // ---------------------------------------------------------
+  @ExceptionHandler(EmailServiceFailedException.class)
+  public ResponseEntity<ErrorDTO> handleEmailFailure(
+    EmailServiceFailedException ex, WebRequest request) {
+
+    HttpServletRequest servletRequest = ((ServletWebRequest) request).getRequest();
+
+    ErrorDTO body =
+        new ErrorDTO(
+            HttpStatus.SERVICE_UNAVAILABLE,
+            ex.getMessage(),
+            servletRequest.getRequestURI(),
+            servletRequest.getMethod());
+
+    return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(body);
+}
+
 }
