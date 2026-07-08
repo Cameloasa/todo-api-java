@@ -1,4 +1,4 @@
-package dev.cameloasa.todoapi.fixtures;
+package dev.cameloasa.todoapi.unit.fixtures;
 
 import dev.cameloasa.todoapi.auth.dto.LoginDTOForm;
 import dev.cameloasa.todoapi.auth.dto.RegisterDTOForm;
@@ -7,22 +7,23 @@ import dev.cameloasa.todoapi.domanin.entity.Person;
 import dev.cameloasa.todoapi.domanin.entity.Role;
 import dev.cameloasa.todoapi.domanin.entity.User;
 
+
 public class AuthFixture {
 
   public static RegisterDTOForm sampleRegisterForm() {
     RegisterDTOForm dto = new RegisterDTOForm();
-    dto.setFirstName("Camelia");
-    dto.setLastName("Test");
+    dto.setFirstName("Test");
+    dto.setLastName("Person");
     dto.setEmail("test@example.com");
-    dto.setUsername("testuser");
-    dto.setPassword("password123");
+    dto.setUsername("test");
+    dto.setPassword("Password123!");
     return dto;
   }
 
   public static LoginDTOForm sampleLoginForm() {
     LoginDTOForm dto = new LoginDTOForm();
-    dto.setUsername("testuser");
-    dto.setPassword("password123");
+    dto.setUsername("test");
+    dto.setPassword("Password123!");
     return dto;
   }
 

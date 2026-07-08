@@ -1,4 +1,4 @@
-package dev.cameloasa.todoapi.fixtures;
+package dev.cameloasa.todoapi.unit.fixtures;
 
 import dev.cameloasa.todoapi.domanin.entity.Task;
 
