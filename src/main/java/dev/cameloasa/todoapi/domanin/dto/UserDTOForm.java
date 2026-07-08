@@ -1,7 +1,7 @@
 package dev.cameloasa.todoapi.domanin.dto;
 
 import jakarta.validation.constraints.*;
-import java.util.Set;
+import java.util.List;
 import lombok.*;
 
 @Getter
@@ -19,7 +19,7 @@ public class UserDTOForm {
   @NotBlank(message = "Password is required.")
   @Size(min = 8, message = "Password must be at least 8 characters.")
   @Pattern(
-      regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$",
+      regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{8,}$",
       message =
           "Password must contain at least one uppercase letter, one lowercase letter, one number, one special character.")
   private String password;
@@ -30,7 +30,7 @@ public class UserDTOForm {
 
   @NotNull(message = "Roles cannot be null.")
   @Size(min = 1, message = "User must have at least one role.")
-  private Set<Long> roleIds; // just the IDs of the roles, not the full RoleDTOView objects
+  private List<Long> roleIds; // just the IDs of the roles, not the full RoleDTOView objects
 
   private boolean expired;
 }

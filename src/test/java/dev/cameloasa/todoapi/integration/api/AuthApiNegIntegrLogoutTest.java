@@ -23,17 +23,13 @@ import org.springframework.test.web.servlet.MockMvc;
 @Transactional
 public class AuthApiNegIntegrLogoutTest {
 
-  @Autowired
-  private MockMvc mockMvc;
+  @Autowired private MockMvc mockMvc;
 
-  @Autowired
-  private UserRepository userRepository;
+  @Autowired private UserRepository userRepository;
 
-  @Autowired
-  private PersonRepository personRepository;
+  @Autowired private PersonRepository personRepository;
 
-  @Autowired
-  private SessionRepository sessionRepository;
+  @Autowired private SessionRepository sessionRepository;
 
   // ---------------------------------------------------------
   // Helper: seed user
