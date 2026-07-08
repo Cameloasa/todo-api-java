@@ -33,14 +33,13 @@ public class AuthFixture {
     return dto;
   }
 
-public static RegisterDTOView sampleRegisterDTOView(User user, Person person) {
+  public static RegisterDTOView sampleRegisterDTOView(User user, Person person) {
     RegisterDTOView dto = new RegisterDTOView();
     dto.setUser(UserFixture.sampleUserDTOView());
     dto.setPerson(PersonFixture.samplePersonDTOView(user));
     dto.setSuccess(true);
     return dto;
-}
-
+  }
 
   // -------------------------
   // User entities

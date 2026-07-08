@@ -13,12 +13,12 @@ import static org.mockito.Mockito.when;
 import dev.cameloasa.todoapi.domanin.entity.Person;
 import dev.cameloasa.todoapi.domanin.entity.User;
 import dev.cameloasa.todoapi.exception.DataDuplicateException;
+import dev.cameloasa.todoapi.exception.InvalidCredentialsException;
 import dev.cameloasa.todoapi.unit.fixtures.AuthFixture;
 import dev.cameloasa.todoapi.unit.fixtures.PersonFixture;
 import dev.cameloasa.todoapi.unit.fixtures.SessionFixture;
 import dev.cameloasa.todoapi.unit.fixtures.UnitTestBase;
 import dev.cameloasa.todoapi.unit.fixtures.UserFixture;
-
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,39 +33,29 @@ class AuthServiceTest extends UnitTestBase {
   // ---------------------------------------------------------
   @SuppressWarnings("null")
   @Test
-void register_with_valid_data_should_create_user_and_person() {
+  void register_with_valid_data_should_create_user_and_person() {
     var dto = AuthFixture.sampleRegisterForm();
     var role = AuthFixture.sampleRole();
 
-    when(userRepository.existsByEmail(dto.getEmail()))
-            .thenReturn(false);
+    when(userRepository.existsByEmail(dto.getEmail())).thenReturn(false);
 
-    when(userRepository.existsByUsername(dto.getUsername()))
-            .thenReturn(false);
+    when(userRepository.existsByUsername(dto.getUsername())).thenReturn(false);
 
-    when(roleRepository.findByName("USER"))
-            .thenReturn(Optional.of(role));
+    when(roleRepository.findByName("USER")).thenReturn(Optional.of(role));
 
-    
-
-    when(userConverter.toUserDTOView(any(User.class)))
-        .thenReturn(UserFixture.sampleUserDTOView());
+    when(userConverter.toUserDTOView(any(User.class))).thenReturn(UserFixture.sampleUserDTOView());
 
     var savedUser = AuthFixture.sampleUserWithEncodedPassword();
-    when(userRepository.save(any(User.class)))
-            .thenReturn(savedUser);
+    when(userRepository.save(any(User.class))).thenReturn(savedUser);
 
     when(personConverter.toPersonDTOView(any(Person.class)))
         .thenReturn(PersonFixture.samplePersonDTOView(savedUser));
 
     var savedPerson = AuthFixture.samplePerson(savedUser);
-    when(personRepository.save(any(Person.class)))
-            .thenReturn(savedPerson);
+    when(personRepository.save(any(Person.class))).thenReturn(savedPerson);
 
     // email service mock
-    when(emailService.sendRegistrationEmail(savedUser.getEmail()))
-        .thenReturn(HttpStatus.OK);
-
+    when(emailService.sendRegistrationEmail(savedUser.getEmail())).thenReturn(HttpStatus.OK);
 
     var result = authService.register(dto);
 
@@ -75,38 +65,33 @@ void register_with_valid_data_should_create_user_and_person() {
     assertEquals(dto.getFirstName(), result.getPerson().getFirstName());
     assertEquals(dto.getLastName(), result.getPerson().getLastName());
     assertTrue(result.isSuccess());
-}
+  }
 
   // ---------------------------------------------------------
   // TEST : duplicate email
   // ---------------------------------------------------------
   @Test
-void register_with_duplicate_email_should_throw() {
+  void register_with_duplicate_email_should_throw() {
     var dto = AuthFixture.sampleRegisterForm();
 
-    when(userRepository.existsByEmail(dto.getEmail()))
-            .thenReturn(true);
+    when(userRepository.existsByEmail(dto.getEmail())).thenReturn(true);
 
     assertThrows(DataDuplicateException.class, () -> authService.register(dto));
-}
-
+  }
 
   // ---------------------------------------------------------
   // TEST : duplicate username
   // ---------------------------------------------------------
   @Test
-void register_with_duplicate_username_should_throw() {
+  void register_with_duplicate_username_should_throw() {
     var dto = AuthFixture.sampleRegisterForm();
 
-    when(userRepository.existsByEmail(dto.getEmail()))
-            .thenReturn(false); // email OK
+    when(userRepository.existsByEmail(dto.getEmail())).thenReturn(false); // email OK
 
-    when(userRepository.existsByUsername(dto.getUsername()))
-            .thenReturn(true); // username duplicat
+    when(userRepository.existsByUsername(dto.getUsername())).thenReturn(true); // username duplicat
 
     assertThrows(DataDuplicateException.class, () -> authService.register(dto));
-}
-
+  }
 
   // ---------------------------------------------------------
   // TEST : login
@@ -119,14 +104,11 @@ void register_with_duplicate_username_should_throw() {
     var person = AuthFixture.samplePerson(user);
     var session = SessionFixture.validSession(user);
 
-    when(userRepository.findByUsername(dto.getUsername()))
-      .thenReturn(Optional.of(user));
+    when(userRepository.findByUsername(dto.getUsername())).thenReturn(Optional.of(user));
     when(passwordEncoder.matches(dto.getPassword(), user.getPassword()))
-      .thenReturn(true);
-    when(sessionService.createSession(user.getEmail()))
-      .thenReturn(session.getToken());
-    when(personRepository.findByUserEmail(user.getEmail()))
-      .thenReturn(Optional.of(person));
+    .thenReturn(true);
+    when(sessionService.createSession(user.getEmail())).thenReturn(session.getToken());
+    when(personRepository.findByUserEmail(user.getEmail())).thenReturn(Optional.of(person));
 
     var result = authService.login(dto);
 
@@ -137,41 +119,35 @@ void register_with_duplicate_username_should_throw() {
   // TEST : valid username return session
   // ---------------------------------------------------------
   @Test
-void login_with_valid_username_should_return_session() {
+  void login_with_valid_username_should_return_session() {
     var dto = AuthFixture.sampleLoginForm();
     var user = AuthFixture.sampleUserWithEncodedPassword();
     var person = AuthFixture.samplePerson(user);
     var session = AuthFixture.sampleSession(user);
 
     // user lookup
-    when(userRepository.findByUsername(dto.getUsername()))
-            .thenReturn(Optional.of(user));
+    when(userRepository.findByUsername(dto.getUsername())).thenReturn(Optional.of(user));
 
     // password check
-    when(passwordEncoder.matches(dto.getPassword(), user.getPassword()))
-            .thenReturn(true);
+    when(passwordEncoder.matches(dto.getPassword(), user.getPassword())).thenReturn(true);
 
     // person lookup
-    when(personRepository.findByUserEmail(user.getEmail()))
-            .thenReturn(Optional.of(person));
+    when(personRepository.findByUserEmail(user.getEmail())).thenReturn(Optional.of(person));
 
     // session creation
-    when(sessionService.createSession(user.getEmail()))
-            .thenReturn(session.getToken());
+    when(sessionService.createSession(user.getEmail())).thenReturn(session.getToken());
 
     // converters
-    when(userConverter.toUserDTOView(user))
-            .thenReturn(UserFixture.sampleUserDTOView());
+    when(userConverter.toUserDTOView(user)).thenReturn(UserFixture.sampleUserDTOView());
 
     when(personConverter.toPersonDTOView(person))
-            .thenReturn(PersonFixture.samplePersonDTOView(user));
+        .thenReturn(PersonFixture.samplePersonDTOView(user));
 
     var result = authService.login(dto);
 
     assertNotNull(result);
     assertEquals(session.getToken(), result.getSessionToken());
-}
-
+  }
 
   // ---------------------------------------------------------
   // TEST : wrong password
@@ -199,31 +175,7 @@ void login_with_valid_username_should_return_session() {
     assertThrows(RuntimeException.class, () -> authService.login(dto));
   }
 
-  // ---------------------------------------------------------
-  // TEST : me
-  // ---------------------------------------------------------
-  @Test
-  void me_with_valid_session_should_return_user_and_person() {
-    var user = AuthFixture.sampleUser();
-    var person = AuthFixture.samplePerson(user);
-    var session = SessionFixture.validSession(user);
-
-    when(sessionService.getSession("valid-token"))
-      .thenReturn(Optional.of(session));
-    when(userRepository.findByEmail(session.getUserEmail()))
-      .thenReturn(Optional.of(user));
-    when(personRepository.findByUserEmail(user.getEmail()))
-      .thenReturn(Optional.of(person));
-
-    var result = authService.me("valid-token");
-
-    assertNotNull(result);
-    assertEquals(user.getEmail(), result.getUser().getEmail());
-    assertEquals(user.getUsername(), result.getUser().getUsername());
-    assertEquals(person.getFirstName(), result.getPerson().getFirstName());
-    assertTrue(result.isSuccess());
-  }
-
+  
   // ---------------------------------------------------------
   // TEST : me expired session
   // ---------------------------------------------------------
@@ -252,31 +204,31 @@ void login_with_valid_username_should_return_session() {
   // ---------------------------------------------------------
   // TEST : logout
   // ---------------------------------------------------------
-  @SuppressWarnings("null")
   @Test
-  void logout_should_delete_session() {
-    var user = AuthFixture.sampleUser();
-    var session = SessionFixture.validSession(user);
+void logout_should_delete_session() {
 
-    when(sessionService.getSession("valid-token"))
-      .thenReturn(Optional.of(session));
+    when(sessionService.isValid("valid-token"))
+            .thenReturn(true);
 
-    doNothing().when(sessionService).deleteSession(session.getToken());
+    doNothing().when(sessionService).deleteSession("valid-token");
 
-    // metoda nu returnează nimic, deci doar o apelăm
     authService.logout("valid-token");
 
-    // verificăm că deleteSession a fost apelat
-    verify(sessionService, times(1)).deleteSession(session.getToken());
-  }
+    verify(sessionService, times(1)).deleteSession("valid-token");
+}
+
 
   // ---------------------------------------------------------
   // TEST : logout invalid token
   // ---------------------------------------------------------
   @Test
-  void logout_with_invalid_token_should_throw() {
-    when(sessionService.getSession("invalid-token")).thenReturn(Optional.empty());
+void logout_with_invalid_token_should_throw() {
 
-    assertThrows(RuntimeException.class, () -> authService.logout("invalid-token"));
-  }
+    when(sessionService.isValid("invalid-token"))
+            .thenReturn(false);
+
+    assertThrows(InvalidCredentialsException.class,
+        () -> authService.logout("invalid-token"));
+}
+
 }

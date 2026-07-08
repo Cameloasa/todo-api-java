@@ -12,6 +12,7 @@ import dev.cameloasa.todoapi.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
@@ -25,6 +26,7 @@ public abstract class IntegrationTestBase {
   @Autowired protected SessionRepository sessionRepository;
   @Autowired protected RoleRepository roleRepository;
   @Autowired protected TaskRepository taskRepository;
+  @Autowired protected PasswordEncoder passwordEncoder;
 
   @BeforeEach
   void cleanDatabase() {
@@ -46,7 +48,7 @@ public abstract class IntegrationTestBase {
     User u = new User();
     u.setEmail(email);
     u.setUsername(email.split("@")[0]);
-    u.setPassword("Password123!");
+    u.setPassword(passwordEncoder.encode("Password123!"));
     u.setExpired(false);
     return userRepository.save(u);
   }
