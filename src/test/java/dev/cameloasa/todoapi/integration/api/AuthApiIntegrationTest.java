@@ -82,6 +82,7 @@ public class AuthApiIntegrationTest extends IntegrationTestBase {
     mockMvc
         .perform(
             post("/auth/register").contentType(MediaType.APPLICATION_JSON).content(registerJson))
+        .andDo(print())
         .andExpect(status().isCreated());
 
     // 2. Login
@@ -95,6 +96,7 @@ public class AuthApiIntegrationTest extends IntegrationTestBase {
 
     mockMvc
         .perform(post("/auth/login").contentType(MediaType.APPLICATION_JSON).content(loginJson))
+        .andDo(print())
         .andExpect(status().isOk())
         .andExpect(cookie().exists("session_token"));
   }
