@@ -3,12 +3,11 @@ package dev.cameloasa.todoapi.controller;
 import dev.cameloasa.todoapi.domanin.dto.*;
 import dev.cameloasa.todoapi.service.PersonService;
 import java.util.List;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = "http://localhost:3000")
-@RequestMapping("/persons")
+@RequestMapping("/auth/persons")
 @RestController
 public class PersonController {
 
@@ -17,14 +16,7 @@ public class PersonController {
   public PersonController(PersonService personService) {
     this.personService = personService;
   }
-
-  // CREATE
-  @PostMapping
-  public ResponseEntity<PersonDTOView> doCreate(@RequestBody PersonDTOForm dtoForm) {
-    PersonDTOView responseBody = personService.create(dtoForm);
-    return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
-  }
-
+   // admin has acces to endpoints
   // FIND BY ID
   @GetMapping("/{id}")
   public ResponseEntity<PersonDTOView> doFindPersonById(@PathVariable Long id) {

@@ -20,6 +20,7 @@ public class RoleDataLoader implements CommandLineRunner {
     createRoleIfMissing("ADMIN");
     createRoleIfMissing("USER");
     createRoleIfMissing("GUEST");
+    createRoleIfMissing("SUPERADMIN");
   }
 
   private void createRoleIfMissing(String name) {

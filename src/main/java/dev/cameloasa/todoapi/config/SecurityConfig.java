@@ -29,21 +29,29 @@ public class SecurityConfig {
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
             .authorizeHttpRequests(auth -> auth
+
                 // Public endpoints
-                .requestMatchers("/auth/register", "/auth/login", "/auth/me", "/auth/logout")
+                .requestMatchers("/auth/register", "/auth/login", "/auth/logout", "/auth/me")
                 .permitAll()
 
-                // Authenticated endpoints (handled manually in AuthService)
-                .requestMatchers("/persons/me").permitAll()
-                .requestMatchers("/tasks/**").permitAll()
+                // SUPERADMIN: create roles
+                .requestMatchers("/auth/roles/create").hasRole("SUPERADMIN")
 
-                // Admin-only endpoints
-                .requestMatchers("/users/**").hasRole("ADMIN")
-                .requestMatchers("/persons/{id}").hasRole("ADMIN")
+                // ADMIN + SUPERADMIN: view roles
+                .requestMatchers("/auth/roles").hasAnyRole("ADMIN", "SUPERADMIN")
+
+                // ADMIN: persons management
+                .requestMatchers("/auth/persons/**").hasRole("ADMIN")
+
+                // ADMIN: users management
+                .requestMatchers("/auth/users/**").hasRole("ADMIN")
 
                 // Everything else blocked
                 .anyRequest().denyAll()
             );
+
+
+              
 
         return http.build();
     }
