@@ -1,12 +1,12 @@
 package dev.cameloasa.todoapi.integration.api;
 
-import dev.cameloasa.todoapi.auth.session.SessionRepository;
 import dev.cameloasa.todoapi.domanin.entity.Person;
 import dev.cameloasa.todoapi.domanin.entity.Role;
 import dev.cameloasa.todoapi.domanin.entity.Task;
 import dev.cameloasa.todoapi.domanin.entity.User;
 import dev.cameloasa.todoapi.repository.PersonRepository;
 import dev.cameloasa.todoapi.repository.RoleRepository;
+import dev.cameloasa.todoapi.repository.SessionRepository;
 import dev.cameloasa.todoapi.repository.TaskRepository;
 import dev.cameloasa.todoapi.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;

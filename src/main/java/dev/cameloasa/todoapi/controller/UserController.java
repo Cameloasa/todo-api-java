@@ -29,7 +29,7 @@ public class UserController {
     return ResponseEntity.status(HttpStatus.CREATED).body(userService.register(dtoForm));
   }
 
-  @GetMapping
+  @GetMapping(("/email"))
   public ResponseEntity<UserDTOView> getByEmail(@RequestParam @NotEmpty @Email String email) {
     return ResponseEntity.ok(userService.getByEmail(email));
   }

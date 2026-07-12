@@ -15,9 +15,14 @@ public class RoleDataLoader implements CommandLineRunner {
   }
 
   @Override
-  public void run(String... args) throws Exception {
-    roleRepository.save(new Role("ADMIN"));
-    roleRepository.save(new Role("USER"));
-    roleRepository.save(new Role("GUEST"));
+  public void run(String... args) {
+
+    createRoleIfMissing("ADMIN");
+    createRoleIfMissing("USER");
+    createRoleIfMissing("GUEST");
+  }
+
+  private void createRoleIfMissing(String name) {
+    roleRepository.findByName(name).orElseGet(() -> roleRepository.save(new Role(name)));
   }
 }

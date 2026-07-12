@@ -1,5 +1,6 @@
-package dev.cameloasa.todoapi.auth.session;
+package dev.cameloasa.todoapi.repository;
 
+import dev.cameloasa.todoapi.domanin.entity.SessionEntity;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 

@@ -2,8 +2,10 @@ package dev.cameloasa.todoapi.service;
 
 import dev.cameloasa.todoapi.domanin.dto.EmailDTO;
 import dev.cameloasa.todoapi.exception.EmailServiceFailedException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -12,10 +14,18 @@ import org.springframework.web.client.RestTemplate;
 @Service
 public class EmailService {
 
+  @Value("${email.fake:false}")
+  private boolean fakeEmail;
+
   private final RestTemplate restTemplate = new RestTemplate();
   private final String EMAIL_SERVICE_SEND_URL = "http://localhost:9090/email";
 
   public HttpStatusCode sendRegistrationEmail(String registeredEmail) {
+
+    if (fakeEmail) {
+      System.out.println("FAKE EMAIL SENT TO: " + registeredEmail);
+      return HttpStatus.OK;
+    }
 
     EmailDTO dto =
         EmailDTO.builder()
@@ -40,7 +50,6 @@ public class EmailService {
     }
   }
 
-  @SuppressWarnings("null")
   public ResponseEntity<EmailDTO> sendEmail(EmailDTO emailDTO) {
     return restTemplate.exchange(
         EMAIL_SERVICE_SEND_URL, HttpMethod.POST, new HttpEntity<>(emailDTO), EmailDTO.class);

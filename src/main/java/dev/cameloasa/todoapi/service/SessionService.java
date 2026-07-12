@@ -1,7 +1,7 @@
-package dev.cameloasa.todoapi.auth.service;
+package dev.cameloasa.todoapi.service;
 
-import dev.cameloasa.todoapi.auth.session.SessionEntity;
-import dev.cameloasa.todoapi.auth.session.SessionRepository;
+import dev.cameloasa.todoapi.domanin.entity.SessionEntity;
+import dev.cameloasa.todoapi.repository.SessionRepository;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;

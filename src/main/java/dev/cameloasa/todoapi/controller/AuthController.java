@@ -1,10 +1,9 @@
-package dev.cameloasa.todoapi.auth.controller;
+package dev.cameloasa.todoapi.controller;
 
-import dev.cameloasa.todoapi.auth.dto.LoginDTOForm;
-import dev.cameloasa.todoapi.auth.dto.RegisterDTOForm;
-import dev.cameloasa.todoapi.auth.dto.RegisterDTOView;
-import dev.cameloasa.todoapi.auth.dto.SessionResponseDTO;
-import dev.cameloasa.todoapi.auth.service.AuthService;
+import dev.cameloasa.todoapi.domanin.dto.LoginDTOForm;
+import dev.cameloasa.todoapi.domanin.dto.RegisterDTOForm;
+import dev.cameloasa.todoapi.domanin.dto.SessionResponseDTO;
+import dev.cameloasa.todoapi.service.AuthService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -27,10 +26,11 @@ public class AuthController {
   // REGISTER → 201 Created
   // ---------------------------------------------------------
   @PostMapping("/register")
-  public ResponseEntity<RegisterDTOView> register(@Valid @RequestBody RegisterDTOForm dto) {
-    RegisterDTOView response = authService.register(dto);
+  public ResponseEntity<SessionResponseDTO> register(@Valid @RequestBody RegisterDTOForm dto) {
+    SessionResponseDTO response = authService.register(dto);
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
+  
 
   // ---------------------------------------------------------
   // LOGIN → 200 OK

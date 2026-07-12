@@ -1,7 +1,5 @@
-package dev.cameloasa.todoapi.auth.dto;
+package dev.cameloasa.todoapi.domanin.dto;
 
-import dev.cameloasa.todoapi.domanin.dto.PersonDTOView;
-import dev.cameloasa.todoapi.domanin.dto.UserDTOView;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -78,6 +78,19 @@
             <optional>true</optional>
         </dependency>
 
+                <!-- Spring Security (full) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+
+        <!-- Optional, but recommended for method-level security -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-config</artifactId>
+        </dependency>
+
+
         <!-- Spring Security Crypto: BCryptPasswordEncoder, hashing, crypto utils -->
         <dependency>
             <groupId>org.springframework.security</groupId>

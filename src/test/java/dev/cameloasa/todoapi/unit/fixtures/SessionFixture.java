@@ -1,6 +1,6 @@
 package dev.cameloasa.todoapi.unit.fixtures;
 
-import dev.cameloasa.todoapi.auth.session.SessionEntity;
+import dev.cameloasa.todoapi.domanin.entity.SessionEntity;
 import dev.cameloasa.todoapi.domanin.entity.User;
 
 public class SessionFixture {

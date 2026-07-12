@@ -105,8 +105,7 @@ class AuthServiceTest extends UnitTestBase {
     var session = SessionFixture.validSession(user);
 
     when(userRepository.findByUsername(dto.getUsername())).thenReturn(Optional.of(user));
-    when(passwordEncoder.matches(dto.getPassword(), user.getPassword()))
-    .thenReturn(true);
+    when(passwordEncoder.matches(dto.getPassword(), user.getPassword())).thenReturn(true);
     when(sessionService.createSession(user.getEmail())).thenReturn(session.getToken());
     when(personRepository.findByUserEmail(user.getEmail())).thenReturn(Optional.of(person));
 
@@ -175,7 +174,6 @@ class AuthServiceTest extends UnitTestBase {
     assertThrows(RuntimeException.class, () -> authService.login(dto));
   }
 
-  
   // ---------------------------------------------------------
   // TEST : me expired session
   // ---------------------------------------------------------
@@ -205,30 +203,25 @@ class AuthServiceTest extends UnitTestBase {
   // TEST : logout
   // ---------------------------------------------------------
   @Test
-void logout_should_delete_session() {
+  void logout_should_delete_session() {
 
-    when(sessionService.isValid("valid-token"))
-            .thenReturn(true);
+    when(sessionService.isValid("valid-token")).thenReturn(true);
 
     doNothing().when(sessionService).deleteSession("valid-token");
 
     authService.logout("valid-token");
 
     verify(sessionService, times(1)).deleteSession("valid-token");
-}
-
+  }
 
   // ---------------------------------------------------------
   // TEST : logout invalid token
   // ---------------------------------------------------------
   @Test
-void logout_with_invalid_token_should_throw() {
+  void logout_with_invalid_token_should_throw() {
 
-    when(sessionService.isValid("invalid-token"))
-            .thenReturn(false);
+    when(sessionService.isValid("invalid-token")).thenReturn(false);
 
-    assertThrows(InvalidCredentialsException.class,
-        () -> authService.logout("invalid-token"));
-}
-
+    assertThrows(InvalidCredentialsException.class, () -> authService.logout("invalid-token"));
+  }
 }

@@ -1,4 +1,4 @@
-package dev.cameloasa.todoapi.auth.session;
+package dev.cameloasa.todoapi.domanin.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

@@ -1,4 +1,4 @@
-package dev.cameloasa.todoapi.auth.dto;
+package dev.cameloasa.todoapi.domanin.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

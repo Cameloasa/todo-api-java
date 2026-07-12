@@ -10,6 +10,7 @@ import dev.cameloasa.todoapi.exception.DataNotFoundException;
 import dev.cameloasa.todoapi.repository.PersonRepository;
 import dev.cameloasa.todoapi.repository.RoleRepository;
 import dev.cameloasa.todoapi.repository.UserRepository;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -118,7 +119,7 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public java.util.List<UserDTOView> getAll() {
+  public List<UserDTOView> getAll() {
     return userRepository.findAll().stream()
         .map(userConverter::toUserDTOView)
         .collect(Collectors.toList());

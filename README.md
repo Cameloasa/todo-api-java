@@ -144,7 +144,7 @@ GET /tasks/title/{title} — task‑uri filtrate după titlu
 ```
 
 🔹The REST API will be available at:
-[http://localhost:(8000]
+[http://localhost:8080]
 
 🔹Swagger:
 [http://localhost:8080/swagger-ui.html]

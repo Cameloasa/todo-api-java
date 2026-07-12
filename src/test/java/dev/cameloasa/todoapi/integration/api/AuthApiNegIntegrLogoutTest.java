@@ -3,7 +3,7 @@ package dev.cameloasa.todoapi.integration.api;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import dev.cameloasa.todoapi.auth.session.SessionEntity;
+import dev.cameloasa.todoapi.domanin.entity.SessionEntity;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import org.junit.jupiter.api.Test;

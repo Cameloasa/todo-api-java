@@ -1,12 +1,12 @@
 package dev.cameloasa.todoapi.unit.fixtures;
 
-import dev.cameloasa.todoapi.auth.dto.LoginDTOForm;
-import dev.cameloasa.todoapi.auth.dto.RegisterDTOForm;
-import dev.cameloasa.todoapi.auth.dto.RegisterDTOView;
-import dev.cameloasa.todoapi.auth.session.SessionEntity;
 import dev.cameloasa.todoapi.domanin.dto.EmailDTO;
+import dev.cameloasa.todoapi.domanin.dto.LoginDTOForm;
+import dev.cameloasa.todoapi.domanin.dto.RegisterDTOForm;
+import dev.cameloasa.todoapi.domanin.dto.RegisterDTOView;
 import dev.cameloasa.todoapi.domanin.entity.Person;
 import dev.cameloasa.todoapi.domanin.entity.Role;
+import dev.cameloasa.todoapi.domanin.entity.SessionEntity;
 import dev.cameloasa.todoapi.domanin.entity.Task;
 import dev.cameloasa.todoapi.domanin.entity.User;
 import java.util.List;
