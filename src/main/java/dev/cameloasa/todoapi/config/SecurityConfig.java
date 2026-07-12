@@ -43,8 +43,20 @@ public class SecurityConfig {
                 // ADMIN: persons management
                 .requestMatchers("/auth/persons/**").hasRole("ADMIN")
 
-                // ADMIN: users management
-                .requestMatchers("/auth/users/**").hasRole("ADMIN")
+                // USER + ADMIN: can view users
+                .requestMatchers("/auth/users/email").authenticated()
+                .requestMatchers("/auth/users/username").authenticated()
+                .requestMatchers("/auth/users/all").authenticated()
+
+                // ADMIN ONLY: manage users
+                .requestMatchers("/auth/users/disable").hasRole("ADMIN")
+                .requestMatchers("/auth/users/enable").hasRole("ADMIN")
+                .requestMatchers("/auth/users").hasRole("ADMIN") // PATCH + DELETE
+
+                // USER + ADMIN: can view tasks
+                .requestMatchers("/auth/tasks/my/**").authenticated()
+                // ADMIN ONLY: manage tasks
+                .requestMatchers("/auth/tasks/**").hasRole("ADMIN")
 
                 // Everything else blocked
                 .anyRequest().denyAll()

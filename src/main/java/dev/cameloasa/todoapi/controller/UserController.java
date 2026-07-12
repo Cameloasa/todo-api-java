@@ -7,14 +7,13 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import java.util.List;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/auth/users")
 @Validated
 public class UserController {
 
@@ -24,11 +23,7 @@ public class UserController {
     this.userService = userService;
   }
 
-  @PostMapping
-  public ResponseEntity<UserDTOView> register(@RequestBody @Valid UserDTOForm dtoForm) {
-    return ResponseEntity.status(HttpStatus.CREATED).body(userService.register(dtoForm));
-  }
-
+  // USER + ADMIN: can view users
   @GetMapping(("/email"))
   public ResponseEntity<UserDTOView> getByEmail(@RequestParam @NotEmpty @Email String email) {
     return ResponseEntity.ok(userService.getByEmail(email));
@@ -44,6 +39,7 @@ public class UserController {
     return ResponseEntity.ok(userService.getAll());
   }
 
+  // ADMIN ONLY: manage users
   @PutMapping("/disable")
   public ResponseEntity<Void> disable(@RequestParam String email) {
     userService.disableEmail(email);

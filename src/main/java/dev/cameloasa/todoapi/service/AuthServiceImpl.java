@@ -159,7 +159,7 @@ private PersonDTOView safeFindPersonByEmail(String email) {
               .getSession(sessionToken)
               .orElseThrow(() -> new InvalidCredentialsException("Invalid session token"));
 
-      System.out.println("SESSION GASITA: " + session.getToken());
+    System.out.println("SESSION GASITA: " + session.getToken());
     System.out.println("SESSION EMAIL: " + session.getUserEmail());
     System.out.println("SESSION CREATED_AT: " + session.getCreatedAt());
     System.out.println("SESSION EXPIRES_AT: " + session.getExpiresAt());
@@ -177,7 +177,7 @@ private PersonDTOView safeFindPersonByEmail(String email) {
 
       // 3. Fetch user safely
       System.out.println("CAUT USER CU EMAIL: " + email);
-    UserDTOView user = safeFindUserByEmail(email);
+      UserDTOView user = safeFindUserByEmail(email);
     if (user == null) {
       System.out.println("USER NU A FOST GASIT → 403");
         throw new InvalidCredentialsException("User not found");
