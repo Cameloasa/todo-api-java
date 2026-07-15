@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,7 +42,7 @@ public class RoleController {
 
   // SUPERADMIN: create new role
     @PostMapping("/create")
-    public ResponseEntity<RoleDTOView> doCreateRole(@RequestBody RoleDTOForm dtoForm) {
+    public ResponseEntity<RoleDTOView> doCreateRole(@Valid @RequestBody RoleDTOForm dtoForm) {
         RoleDTOView created = roleService.create(dtoForm);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
@@ -49,7 +50,7 @@ public class RoleController {
     // SUPERADMIN: assign new role
     @PutMapping("/assign")
     @PreAuthorize("hasRole('SUPERADMIN')")
-    public ResponseEntity<UserDTOView> updateRoles(
+    public ResponseEntity<UserDTOView> updateRoles(@Valid
             @RequestParam String email,
             @RequestBody List<Long> roleIds) {
 

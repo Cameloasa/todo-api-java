@@ -25,12 +25,12 @@ public class UserController {
 
   // USER + ADMIN: can view users
   @GetMapping(("/email"))
-  public ResponseEntity<UserDTOView> getByEmail(@RequestParam @NotEmpty @Email String email) {
+  public ResponseEntity<UserDTOView> getByEmail( @RequestParam @NotEmpty @Email String email) {
     return ResponseEntity.ok(userService.getByEmail(email));
   }
 
   @GetMapping("/username")
-  public ResponseEntity<UserDTOView> getByUsername(@RequestParam @NotEmpty String username) {
+  public ResponseEntity<UserDTOView> getByUsername( @RequestParam @NotEmpty String username) {
     return ResponseEntity.ok(userService.getByUsername(username));
   }
 
@@ -41,13 +41,13 @@ public class UserController {
 
   // ADMIN ONLY: manage users
   @PutMapping("/disable")
-  public ResponseEntity<Void> disable(@RequestParam String email) {
+  public ResponseEntity<Void> disable( @RequestParam String email) {
     userService.disableEmail(email);
     return ResponseEntity.noContent().build();
   }
 
   @PutMapping("/enable")
-  public ResponseEntity<Void> enable(@RequestParam String email) {
+  public ResponseEntity<Void> enable( @RequestParam String email) {
     userService.enableEmail(email);
     return ResponseEntity.noContent().build();
   }

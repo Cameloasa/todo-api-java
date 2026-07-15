@@ -3,6 +3,7 @@ package dev.cameloasa.todoapi.controller;
 import dev.cameloasa.todoapi.domanin.dto.*;
 import dev.cameloasa.todoapi.service.PersonService;
 import java.util.List;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +20,7 @@ public class PersonController {
    // admin has acces to endpoints
   // FIND BY ID
   @GetMapping("/{id}")
-  public ResponseEntity<PersonDTOView> doFindPersonById(@PathVariable Long id) {
+  public ResponseEntity<PersonDTOView> doFindPersonById(@Valid @PathVariable Long id) {
     PersonDTOView responseBody = personService.findById(id);
     return ResponseEntity.ok(responseBody);
   }
@@ -33,35 +34,35 @@ public class PersonController {
 
   // UPDATE
   @PatchMapping
-  public ResponseEntity<PersonDTOView> doUpdate(@RequestBody PersonDTOForm dtoForm) {
+  public ResponseEntity<PersonDTOView> doUpdate(@Valid @RequestBody PersonDTOForm dtoForm) {
     PersonDTOView updated = personService.update(dtoForm);
     return ResponseEntity.ok(updated);
   }
 
   // DELETE
   @DeleteMapping("/{id}")
-  public ResponseEntity<Void> doDelete(@PathVariable Long id) {
+  public ResponseEntity<Void> doDelete(@Valid @PathVariable Long id) {
     personService.delete(id);
     return ResponseEntity.noContent().build();
   }
 
   // FIND BY USER EMAIL
   @GetMapping("/user-email/{email}")
-  public ResponseEntity<PersonDTOView> doFindByUserEmail(@PathVariable String email) {
+  public ResponseEntity<PersonDTOView> doFindByUserEmail(@Valid @PathVariable String email) {
     PersonDTOView responseBody = personService.findByUserEmail(email);
     return ResponseEntity.ok(responseBody);
   }
 
   // SEARCH BY FIRST NAME
   @GetMapping("/search/first-name/{firstName}")
-  public ResponseEntity<List<PersonDTOView>> doSearchByFirstName(@PathVariable String firstName) {
+  public ResponseEntity<List<PersonDTOView>> doSearchByFirstName(@Valid @PathVariable String firstName) {
     List<PersonDTOView> responseBody = personService.searchByFirstName(firstName);
     return ResponseEntity.ok(responseBody);
   }
 
   // SEARCH BY LAST NAME
   @GetMapping("/search/last-name/{lastName}")
-  public ResponseEntity<List<PersonDTOView>> doSearchByLastName(@PathVariable String lastName) {
+  public ResponseEntity<List<PersonDTOView>> doSearchByLastName(@Valid @PathVariable String lastName) {
     List<PersonDTOView> responseBody = personService.searchByLastName(lastName);
     return ResponseEntity.ok(responseBody);
   }

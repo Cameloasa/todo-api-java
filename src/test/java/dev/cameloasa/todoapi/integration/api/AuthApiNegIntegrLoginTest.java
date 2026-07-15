@@ -61,7 +61,7 @@ public class AuthApiNegIntegrLoginTest extends IntegrationTestBase {
     mockMvc
         .perform(post("/auth/login").contentType(MediaType.APPLICATION_JSON).content(json))
         .andDo(print())
-        .andExpect(status().isNotFound());
+        .andExpect(status().isBadRequest());
   }
 
   // ---------------------------------------------------------
@@ -84,7 +84,7 @@ public class AuthApiNegIntegrLoginTest extends IntegrationTestBase {
     mockMvc
         .perform(post("/auth/login").contentType(MediaType.APPLICATION_JSON).content(json))
         .andDo(print())
-        .andExpect(status().isNotFound());
+        .andExpect(status().isUnauthorized());
   }
 
   // ---------------------------------------------------------

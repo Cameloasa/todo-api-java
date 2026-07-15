@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -19,6 +20,8 @@ import dev.cameloasa.todoapi.unit.fixtures.PersonFixture;
 import dev.cameloasa.todoapi.unit.fixtures.SessionFixture;
 import dev.cameloasa.todoapi.unit.fixtures.UnitTestBase;
 import dev.cameloasa.todoapi.unit.fixtures.UserFixture;
+import jakarta.servlet.http.HttpServletResponse;
+
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -98,81 +101,86 @@ class AuthServiceTest extends UnitTestBase {
   // ---------------------------------------------------------
 
   @Test
-  void login_should_work() {
+void login_should_work() {
     var dto = AuthFixture.sampleLoginForm();
     var user = AuthFixture.sampleUser();
     var person = AuthFixture.samplePerson(user);
     var session = SessionFixture.validSession(user);
 
-    when(userRepository.findByUsername(dto.getUsername())).thenReturn(Optional.of(user));
+    HttpServletResponse response = mock(HttpServletResponse.class);
+
+    when(userRepository.findByEmail(dto.getEmail())).thenReturn(Optional.of(user));
     when(passwordEncoder.matches(dto.getPassword(), user.getPassword())).thenReturn(true);
     when(sessionService.createSession(user.getEmail())).thenReturn(session.getToken());
     when(personRepository.findByUserEmail(user.getEmail())).thenReturn(Optional.of(person));
 
-    var result = authService.login(dto);
+    var result = authService.login(dto, response);
 
     assertEquals(session.getToken(), result.getSessionToken());
-  }
+}
 
-  // ---------------------------------------------------------
-  // TEST : valid username return session
-  // ---------------------------------------------------------
   @Test
-  void login_with_valid_username_should_return_session() {
+void login_with_valid_username_should_return_session() {
     var dto = AuthFixture.sampleLoginForm();
     var user = AuthFixture.sampleUserWithEncodedPassword();
     var person = AuthFixture.samplePerson(user);
     var session = AuthFixture.sampleSession(user);
 
+    HttpServletResponse response = mock(HttpServletResponse.class);
+
     // user lookup
-    when(userRepository.findByUsername(dto.getUsername())).thenReturn(Optional.of(user));
+    when(userRepository.findByEmail(dto.getEmail()))
+            .thenReturn(Optional.of(user));
 
     // password check
-    when(passwordEncoder.matches(dto.getPassword(), user.getPassword())).thenReturn(true);
+    when(passwordEncoder.matches(dto.getPassword(), user.getPassword()))
+            .thenReturn(true);
 
     // person lookup
-    when(personRepository.findByUserEmail(user.getEmail())).thenReturn(Optional.of(person));
+    when(personRepository.findByUserEmail(user.getEmail()))
+            .thenReturn(Optional.of(person));
 
     // session creation
-    when(sessionService.createSession(user.getEmail())).thenReturn(session.getToken());
+    when(sessionService.createSession(user.getEmail()))
+            .thenReturn(session.getToken());
 
     // converters
-    when(userConverter.toUserDTOView(user)).thenReturn(UserFixture.sampleUserDTOView());
+    when(userConverter.toUserDTOView(user))
+            .thenReturn(UserFixture.sampleUserDTOView());
 
     when(personConverter.toPersonDTOView(person))
-        .thenReturn(PersonFixture.samplePersonDTOView(user));
+            .thenReturn(PersonFixture.samplePersonDTOView(user));
 
-    var result = authService.login(dto);
+    var result = authService.login(dto, response);
 
     assertNotNull(result);
     assertEquals(session.getToken(), result.getSessionToken());
-  }
+}
 
   // ---------------------------------------------------------
   // TEST : wrong password
   // ---------------------------------------------------------
   @Test
-  void login_with_wrong_password_should_throw() {
+void login_with_wrong_password_should_throw() {
     var dto = AuthFixture.sampleLoginForm();
-    var user = AuthFixture.sampleUser();
+    var user = AuthFixture.sampleUserWithEncodedPassword();
 
-    when(userRepository.findByUsername(dto.getUsername())).thenReturn(Optional.of(user));
-    when(passwordEncoder.matches(dto.getPassword(), user.getPassword())).thenReturn(false);
+    HttpServletResponse response = mock(HttpServletResponse.class);
 
-    assertThrows(RuntimeException.class, () -> authService.login(dto));
-  }
+    // user lookup
+    when(userRepository.findByEmail(dto.getEmail()))
+            .thenReturn(Optional.of(user));
 
-  // ---------------------------------------------------------
-  // TEST : non-existent user
-  // ---------------------------------------------------------
-  @Test
-  void login_with_nonexistent_user_should_throw() {
-    var dto = AuthFixture.sampleLoginForm();
+    // password check → WRONG PASSWORD
+    when(passwordEncoder.matches(dto.getPassword(), user.getPassword()))
+            .thenReturn(false);
 
-    when(userRepository.findByUsername(dto.getUsername())).thenReturn(Optional.empty());
+    assertThrows(InvalidCredentialsException.class,
+            () -> authService.login(dto, response));
+}
 
-    assertThrows(RuntimeException.class, () -> authService.login(dto));
-  }
+
+  
 
   // ---------------------------------------------------------
   // TEST : me expired session

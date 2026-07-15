@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -45,43 +46,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
   }
 
   // ---------------------------------------------------------
-  // 2. 404 Not Found
-  // ---------------------------------------------------------
-  @ExceptionHandler(DataNotFoundException.class)
-  public ResponseEntity<ErrorDTO> handleNotFound(DataNotFoundException ex, WebRequest request) {
-
-    HttpServletRequest servletRequest = ((ServletWebRequest) request).getRequest();
-
-    ErrorDTO body =
-        new ErrorDTO(
-            HttpStatus.NOT_FOUND,
-            ex.getMessage(),
-            servletRequest.getRequestURI(),
-            servletRequest.getMethod());
-
-    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
-  }
-
-  // ---------------------------------------------------------
-  // 3. 409 Conflict
-  // ---------------------------------------------------------
-  @ExceptionHandler(DataDuplicateException.class)
-  public ResponseEntity<ErrorDTO> handleDuplicate(DataDuplicateException ex, WebRequest request) {
-
-    HttpServletRequest servletRequest = ((ServletWebRequest) request).getRequest();
-
-    ErrorDTO body =
-        new ErrorDTO(
-            HttpStatus.CONFLICT,
-            ex.getMessage(),
-            servletRequest.getRequestURI(),
-            servletRequest.getMethod());
-
-    return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
-  }
-
-  // ---------------------------------------------------------
-  // 4. 400 Bad Request (IllegalArgumentException)
+  //  400 Bad Request (IllegalArgumentException)
   // ---------------------------------------------------------
   @ExceptionHandler(IllegalArgumentException.class)
   public ResponseEntity<ErrorDTO> handleIllegalArgument(
@@ -100,7 +65,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
   }
 
   // ---------------------------------------------------------
-  // 5. 401 Unauthorized
+  //  401 Unauthorized
   // ---------------------------------------------------------
   @ExceptionHandler(InvalidCredentialsException.class)
   public ResponseEntity<ErrorDTO> handleInvalidCredentials(
@@ -119,7 +84,65 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
   }
 
   // ---------------------------------------------------------
-  // 6. 500 Internal Server Error (fallback)
+//  403 Forbidden
+// ---------------------------------------------------------
+@ExceptionHandler(AccessDeniedException.class)
+public ResponseEntity<ErrorDTO> handleAccessDenied(
+    AccessDeniedException ex, WebRequest request) {
+
+  HttpServletRequest servletRequest = ((ServletWebRequest) request).getRequest();
+
+  ErrorDTO body =
+      new ErrorDTO(
+          HttpStatus.FORBIDDEN,
+          "Access denied: insufficient permissions",
+          servletRequest.getRequestURI(),
+          servletRequest.getMethod());
+
+  return ResponseEntity.status(HttpStatus.FORBIDDEN).body(body);
+}
+
+
+  // ---------------------------------------------------------
+  //  404 Not Found
+  // ---------------------------------------------------------
+  @ExceptionHandler(DataNotFoundException.class)
+  public ResponseEntity<ErrorDTO> handleNotFound(DataNotFoundException ex, WebRequest request) {
+
+    HttpServletRequest servletRequest = ((ServletWebRequest) request).getRequest();
+
+    ErrorDTO body =
+        new ErrorDTO(
+            HttpStatus.NOT_FOUND,
+            ex.getMessage(),
+            servletRequest.getRequestURI(),
+            servletRequest.getMethod());
+
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+  }
+
+  // ---------------------------------------------------------
+  //  409 Conflict
+  // ---------------------------------------------------------
+  @ExceptionHandler(DataDuplicateException.class)
+  public ResponseEntity<ErrorDTO> handleDuplicate(DataDuplicateException ex, WebRequest request) {
+
+    HttpServletRequest servletRequest = ((ServletWebRequest) request).getRequest();
+
+    ErrorDTO body =
+        new ErrorDTO(
+            HttpStatus.CONFLICT,
+            ex.getMessage(),
+            servletRequest.getRequestURI(),
+            servletRequest.getMethod());
+
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
+  }
+
+  
+
+  // ---------------------------------------------------------
+  //  500 Internal Server Error (fallback)
   // ---------------------------------------------------------
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ErrorDTO> handleGeneral(Exception ex, WebRequest request) {
@@ -137,7 +160,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
   }
 
   // ---------------------------------------------------------
-  // 7/. 500 Internal Server Error (fallback)
+  //  500 Internal Server Error (fallback)
   // ---------------------------------------------------------
   @ExceptionHandler(EmailServiceFailedException.class)
   public ResponseEntity<ErrorDTO> handleEmailFailure(

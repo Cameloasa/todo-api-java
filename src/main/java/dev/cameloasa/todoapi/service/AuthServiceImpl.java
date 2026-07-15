@@ -16,6 +16,8 @@ import dev.cameloasa.todoapi.domanin.entity.User;
 import dev.cameloasa.todoapi.exception.InvalidCredentialsException;
 import dev.cameloasa.todoapi.repository.PersonRepository;
 import dev.cameloasa.todoapi.repository.UserRepository;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -35,35 +37,27 @@ public class AuthServiceImpl implements AuthService {
   private final PersonRepository personRepository;
 
   // ---------------------------------------------------------
-  // Helpers
+  // Helpers (Login Me + Session)
   // ---------------------------------------------------------
-  private User findUserByEmailOrUsername(LoginDTOForm dto) {
 
-    if (dto.getEmail() != null && !dto.getEmail().isBlank()) {
-      return userRepository
-          .findByEmail(dto.getEmail())
-          .orElseThrow(() -> new InvalidCredentialsException("Invalid email"));
+  private void addSessionCookie(HttpServletResponse response, String token) {
+        Cookie cookie = new Cookie("session_token", token);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(60 * 60 * 24);
+        response.addCookie(cookie);
     }
 
-    if (dto.getUsername() != null && !dto.getUsername().isBlank()) {
-      return userRepository
-          .findByUsername(dto.getUsername())
-          .orElseThrow(() -> new InvalidCredentialsException("Invalid username"));
-    }
-
-    throw new InvalidCredentialsException("Email or username must be provided");
-  }
-   
   private UserDTOView safeFindUserByEmail(String email) {
-    return userRepository.findById(email)
+    return userRepository.findByEmail(email)
         .map(userConverter::toUserDTOView)
         .orElse(null);
 }
-private PersonDTOView safeFindPersonByEmail(String email) {
-    return personRepository.findByUserEmail(email)
-        .map(personConverter::toPersonDTOView)
-        .orElse(null);
-}
+  private PersonDTOView safeFindPersonByEmail(String email) {
+      return personRepository.findByUserEmail(email)
+          .map(personConverter::toPersonDTOView)
+          .orElse(null);
+  }
   // ---------------------------------------------------------
   // Register (User + Person + Session)
   // ---------------------------------------------------------
@@ -99,14 +93,15 @@ private PersonDTOView safeFindPersonByEmail(String email) {
   // Login (User + Person + Session)
   // ---------------------------------------------------------
   @Override
-  public SessionResponseDTO login(LoginDTOForm dto) {
+public SessionResponseDTO login(LoginDTOForm dto, HttpServletResponse response) {
 
-    // 1. Găsim user după email sau username
-    User user = findUserByEmailOrUsername(dto);
+    // 1. Găsim user după email
+    User user = userRepository.findByEmail(dto.getEmail())
+            .orElseThrow(() -> new InvalidCredentialsException("Invalid email or password"));
 
     // 2. Verificăm parola
     if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
-      throw new InvalidCredentialsException("Invalid password");
+        throw new InvalidCredentialsException("Invalid email or password");
     }
 
     // 3. Găsim person
@@ -115,14 +110,20 @@ private PersonDTOView safeFindPersonByEmail(String email) {
     // 4. Creăm sesiune
     String token = sessionService.createSession(user.getEmail());
 
-    // 5. Returnăm user + person + token
-    SessionResponseDTO response = new SessionResponseDTO();
-    response.setSessionToken(token);
-    response.setUser(userConverter.toUserDTOView(user));
-    response.setPerson(person);
-    response.setSuccess(true);
-    return response;
-  }
+    // 5. Setăm cookie-ul aici
+    addSessionCookie(response, token);
+
+    // 6. Returnăm user + person + token
+    SessionResponseDTO session = new SessionResponseDTO();
+    session.setSessionToken(token);
+    session.setUser(userConverter.toUserDTOView(user));
+    session.setPerson(person);
+    session.setSuccess(true);
+
+    return session;
+}
+
+
 
   // ---------------------------------------------------------
   // Logout

@@ -23,6 +23,7 @@ import dev.cameloasa.todoapi.exception.InvalidCredentialsException;
 import dev.cameloasa.todoapi.service.PersonService;
 import dev.cameloasa.todoapi.service.SessionService;
 import dev.cameloasa.todoapi.service.TaskService;
+import jakarta.validation.Valid;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
@@ -54,7 +55,7 @@ public class MyTaskController {
     // GET all my tasks
     // ---------------------------------------------------------
     @GetMapping
-    public ResponseEntity<List<TaskDTOView>> getMyTasks(
+    public ResponseEntity<List<TaskDTOView>> getMyTasks(@Valid
             @RequestHeader("X-Session-Token") String token) {
 
         Long personId = getCurrentPersonId(token);
@@ -65,7 +66,7 @@ public class MyTaskController {
     // GET my task by ID
     // ---------------------------------------------------------
     @GetMapping("/{id}")
-    public ResponseEntity<TaskDTOView> getMyTaskById(
+    public ResponseEntity<TaskDTOView> getMyTaskById(@Valid
             @RequestHeader("X-Session-Token") String token,
             @PathVariable Long id) {
 
@@ -83,7 +84,7 @@ public class MyTaskController {
     // CREATE my task
     // ---------------------------------------------------------
     @PostMapping
-    public ResponseEntity<TaskDTOView> createMyTask(
+    public ResponseEntity<TaskDTOView> createMyTask(@Valid
             @RequestHeader("X-Session-Token") String token,
             @RequestBody TaskDTOForm dtoForm) {
 
@@ -98,7 +99,7 @@ public class MyTaskController {
     // UPDATE my task
     // ---------------------------------------------------------
     @PatchMapping("/{id}")
-    public ResponseEntity<TaskDTOView> updateMyTask(
+    public ResponseEntity<TaskDTOView> updateMyTask(@Valid
             @RequestHeader("X-Session-Token") String token,
             @PathVariable Long id,
             @RequestBody TaskDTOForm dtoForm) {
@@ -120,7 +121,7 @@ public class MyTaskController {
     // DELETE my task
     // ---------------------------------------------------------
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteMyTask(
+    public ResponseEntity<Void> deleteMyTask(@Valid
             @RequestHeader("X-Session-Token") String token,
             @PathVariable Long id) {
 
@@ -139,7 +140,7 @@ public class MyTaskController {
     // MARK DONE
     // ---------------------------------------------------------
     @PutMapping("/{id}/done")
-    public ResponseEntity<TaskDTOView> markDone(
+    public ResponseEntity<TaskDTOView> markDone(@Valid
             @RequestHeader("X-Session-Token") String token,
             @PathVariable Long id) {
 
@@ -157,7 +158,7 @@ public class MyTaskController {
     // MARK UNDONE
     // ---------------------------------------------------------
     @PutMapping("/{id}/undone")
-    public ResponseEntity<TaskDTOView> markUndone(
+    public ResponseEntity<TaskDTOView> markUndone(@Valid
             @RequestHeader("X-Session-Token") String token,
             @PathVariable Long id) {
 

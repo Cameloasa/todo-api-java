@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = "http://localhost:3000")
@@ -35,27 +36,21 @@ public class AuthController {
   // ---------------------------------------------------------
   // LOGIN → 200 OK
   // ---------------------------------------------------------
-  @PostMapping("/login")
+    @PostMapping("/login")
   public ResponseEntity<SessionResponseDTO> login(
-      @RequestBody LoginDTOForm dto, HttpServletResponse httpResponse) {
-
-    SessionResponseDTO response = authService.login(dto);
-
-    Cookie cookie = new Cookie("session_token", response.getSessionToken());
-    cookie.setHttpOnly(true);
-    cookie.setPath("/");
-    cookie.setMaxAge(60 * 60 * 24); // 1 zi
-    httpResponse.addCookie(cookie);
-
-    return ResponseEntity.ok(response);
+      @Valid @RequestBody LoginDTOForm dto,
+      HttpServletResponse response
+  ) {
+      SessionResponseDTO session = authService.login(dto, response);
+      return ResponseEntity.ok(session);
   }
 
   // ---------------------------------------------------------
   // LOGOUT → 200 OK (no body)
   // ---------------------------------------------------------
   @PostMapping("/logout")
-  public ResponseEntity<Void> logout(@RequestHeader("X-Session-Token") String sessionToken) {
-    authService.logout(sessionToken);
+  public ResponseEntity<Void> logout( @RequestHeader("X-Session-Token") String sessionToken) {
+    authService.logout(sessionToken); 
     return ResponseEntity.ok().build();
   }
 
@@ -63,6 +58,7 @@ public class AuthController {
   // ME → 200 OK
   // ---------------------------------------------------------
   @GetMapping("/me")
+  @PreAuthorize("hasAnyRole('USER','ADMIN','SUPERADMIN')")
   public ResponseEntity<SessionResponseDTO> me(
       @RequestHeader("X-Session-Token") String sessionToken) {
     SessionResponseDTO response = authService.me(sessionToken);

@@ -5,6 +5,7 @@ import dev.cameloasa.todoapi.domanin.dto.TaskDTOView;
 import dev.cameloasa.todoapi.service.TaskService;
 import java.time.LocalDate;
 import java.util.List;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +23,7 @@ public class TaskController {
 
   // CREATE
   @PostMapping
-  public ResponseEntity<TaskDTOView> doCreate(@RequestBody TaskDTOForm dtoForm) {
+  public ResponseEntity<TaskDTOView> doCreate(@Valid @RequestBody TaskDTOForm dtoForm) {
     TaskDTOView responseBody = taskService.create(dtoForm);
     return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
   }
@@ -43,7 +44,7 @@ public class TaskController {
 
   // UPDATE
   @PatchMapping
-  public ResponseEntity<TaskDTOView> doUpdate(@RequestBody TaskDTOForm dtoForm) {
+  public ResponseEntity<TaskDTOView> doUpdate(@Valid @RequestBody TaskDTOForm dtoForm) {
     TaskDTOView updated = taskService.update(dtoForm);
     return ResponseEntity.ok(updated);
   }
