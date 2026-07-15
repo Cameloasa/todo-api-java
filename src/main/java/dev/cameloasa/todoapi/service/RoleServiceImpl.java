@@ -5,19 +5,18 @@ import dev.cameloasa.todoapi.domanin.dto.RoleDTOForm;
 import dev.cameloasa.todoapi.domanin.dto.RoleDTOView;
 import dev.cameloasa.todoapi.domanin.entity.Role;
 import dev.cameloasa.todoapi.repository.RoleRepository;
+import lombok.RequiredArgsConstructor;
+
 import java.util.List;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class RoleServiceImpl implements RoleService {
 
   private final RoleRepository roleRepository;
   private final RoleConverter roleConverter;
 
-  public RoleServiceImpl(RoleRepository roleRepository, RoleConverter roleConverter) {
-    this.roleRepository = roleRepository;
-    this.roleConverter = roleConverter;
-  }
 
   @Override
   public List<RoleDTOView> getAll() {

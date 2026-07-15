@@ -1,18 +1,19 @@
 package dev.cameloasa.todoapi.integration.api;
 
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doNothing;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import dev.cameloasa.todoapi.service.EmailService;
+import dev.cameloasa.todoapi.service.EmailServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
+
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
@@ -25,7 +26,7 @@ public class AuthApiIntegrationTest extends IntegrationTestBase {
 
   @Autowired private MockMvc mockMvc;
 
-  @MockBean private EmailService emailService;
+  @MockBean private EmailServiceImpl emailService;
 
   // ---------------------------------------------------------
   // TEST 1: register
@@ -34,7 +35,8 @@ public class AuthApiIntegrationTest extends IntegrationTestBase {
   @Test
   void testRegister() throws Exception {
 
-    when(emailService.sendRegistrationEmail(anyString())).thenReturn(HttpStatus.OK);
+    doNothing().when(emailService).sendRegistrationEmail(anyString());
+
 
     String json =
         """
@@ -65,7 +67,6 @@ public class AuthApiIntegrationTest extends IntegrationTestBase {
   @Test
   void testLogin() throws Exception {
 
-    when(emailService.sendRegistrationEmail(anyString())).thenReturn(HttpStatus.OK);
 
     // 1. Register
     String registerJson =
@@ -108,7 +109,6 @@ public class AuthApiIntegrationTest extends IntegrationTestBase {
   @Test
   void testMe() throws Exception {
 
-    when(emailService.sendRegistrationEmail(anyString())).thenReturn(HttpStatus.OK);
 
     // 1. Register
     String registerJson =
@@ -162,7 +162,7 @@ public class AuthApiIntegrationTest extends IntegrationTestBase {
   @Test
   void testLogout() throws Exception {
 
-    when(emailService.sendRegistrationEmail(anyString())).thenReturn(HttpStatus.OK);
+
 
     // 1. Register
     String registerJson =

@@ -1,15 +1,21 @@
 package dev.cameloasa.todoapi.service;
 
 import dev.cameloasa.todoapi.converter.UserConverter;
+
 import dev.cameloasa.todoapi.domanin.dto.UserDTOForm;
 import dev.cameloasa.todoapi.domanin.dto.UserDTOView;
 import dev.cameloasa.todoapi.domanin.entity.Role;
 import dev.cameloasa.todoapi.domanin.entity.User;
-import dev.cameloasa.todoapi.exception.DataDuplicateException;
-import dev.cameloasa.todoapi.exception.DataNotFoundException;
+
 import dev.cameloasa.todoapi.repository.PersonRepository;
 import dev.cameloasa.todoapi.repository.RoleRepository;
 import dev.cameloasa.todoapi.repository.UserRepository;
+
+import dev.cameloasa.todoapi.exception.DataDuplicateException;
+import dev.cameloasa.todoapi.exception.DataNotFoundException;
+
+import lombok.RequiredArgsConstructor;
+
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -18,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
   private final UserRepository userRepository;
@@ -26,18 +33,6 @@ public class UserServiceImpl implements UserService {
   private final PasswordEncoder passwordEncoder;
   private final UserConverter userConverter;
 
-  public UserServiceImpl(
-      UserRepository userRepository,
-      RoleRepository roleRepository,
-      PersonRepository personRepository,
-      PasswordEncoder passwordEncoder,
-      UserConverter userConverter) {
-    this.userRepository = userRepository;
-    this.roleRepository = roleRepository;
-    this.personRepository = personRepository;
-    this.passwordEncoder = passwordEncoder;
-    this.userConverter = userConverter;
-  }
 
   @Override
   @Transactional
@@ -49,6 +44,10 @@ public class UserServiceImpl implements UserService {
 
     if (userRepository.existsByEmail(dtoForm.getEmail())) {
       throw new DataDuplicateException("Email already exists");
+    }
+
+     if (userRepository.existsByUsername(dtoForm.getUsername())) {
+      throw new DataDuplicateException("Username already exists");
     }
 
     // Validate roles

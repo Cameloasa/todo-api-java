@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -26,7 +27,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
+
 
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest extends UnitTestBase {
@@ -58,7 +59,8 @@ class AuthServiceTest extends UnitTestBase {
     when(personRepository.save(any(Person.class))).thenReturn(savedPerson);
 
     // email service mock
-    when(emailService.sendRegistrationEmail(savedUser.getEmail())).thenReturn(HttpStatus.OK);
+    doNothing().when(emailService).sendRegistrationEmail(anyString());
+
 
     var result = authService.register(dto);
 

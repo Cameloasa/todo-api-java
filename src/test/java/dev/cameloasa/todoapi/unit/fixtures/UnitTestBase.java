@@ -10,7 +10,7 @@ import dev.cameloasa.todoapi.repository.SessionRepository;
 import dev.cameloasa.todoapi.repository.TaskRepository;
 import dev.cameloasa.todoapi.repository.UserRepository;
 import dev.cameloasa.todoapi.service.AuthServiceImpl;
-import dev.cameloasa.todoapi.service.EmailService;
+import dev.cameloasa.todoapi.service.EmailServiceImpl;
 import dev.cameloasa.todoapi.service.PersonServiceImpl;
 import dev.cameloasa.todoapi.service.SessionService;
 import dev.cameloasa.todoapi.service.TaskServiceImpl;
@@ -38,7 +38,7 @@ public abstract class UnitTestBase {
   // -------------------------
   @Mock protected SessionService sessionService;
   @Mock protected PasswordEncoder passwordEncoder;
-  @Mock protected EmailService emailService;
+  @Mock protected EmailServiceImpl emailService;
 
   // -------------------------
   // MOCKED Convertors

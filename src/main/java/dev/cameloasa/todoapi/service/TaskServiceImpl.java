@@ -8,6 +8,8 @@ import dev.cameloasa.todoapi.domanin.entity.Task;
 import dev.cameloasa.todoapi.exception.DataNotFoundException;
 import dev.cameloasa.todoapi.repository.PersonRepository;
 import dev.cameloasa.todoapi.repository.TaskRepository;
+import lombok.RequiredArgsConstructor;
+
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -16,20 +18,13 @@ import org.springframework.validation.annotation.Validated;
 
 @Service
 @Validated
+@RequiredArgsConstructor
 public class TaskServiceImpl implements TaskService {
 
   private final TaskRepository taskRepository;
   private final TaskConverter taskConverter;
   private final PersonRepository personRepository;
 
-  public TaskServiceImpl(
-      TaskRepository taskRepository,
-      TaskConverter taskConverter,
-      PersonRepository personRepository) {
-    this.taskRepository = taskRepository;
-    this.taskConverter = taskConverter;
-    this.personRepository = personRepository;
-  }
 
   @Override
   @Transactional

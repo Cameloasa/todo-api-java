@@ -1,6 +1,8 @@
 package dev.cameloasa.todoapi.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
+
+
 import java.util.stream.Collectors;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -139,7 +141,24 @@ public ResponseEntity<ErrorDTO> handleAccessDenied(
     return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
   }
 
-  
+  // ---------------------------------------------------------
+  //  503 Email service failed exception
+  // ---------------------------------------------------------
+  @ExceptionHandler(EmailServiceFailedException.class)
+  public ResponseEntity<ErrorDTO> handleEmailFailure(
+      EmailServiceFailedException ex, WebRequest request) {
+
+    HttpServletRequest servletRequest = ((ServletWebRequest) request).getRequest();
+
+    ErrorDTO body =
+        new ErrorDTO(
+            HttpStatus.SERVICE_UNAVAILABLE,
+            ex.getMessage(),
+            servletRequest.getRequestURI(),
+            servletRequest.getMethod());
+
+    return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(body);
+  }
 
   // ---------------------------------------------------------
   //  500 Internal Server Error (fallback)
@@ -159,22 +178,5 @@ public ResponseEntity<ErrorDTO> handleAccessDenied(
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
   }
 
-  // ---------------------------------------------------------
-  //  500 Internal Server Error (fallback)
-  // ---------------------------------------------------------
-  @ExceptionHandler(EmailServiceFailedException.class)
-  public ResponseEntity<ErrorDTO> handleEmailFailure(
-      EmailServiceFailedException ex, WebRequest request) {
-
-    HttpServletRequest servletRequest = ((ServletWebRequest) request).getRequest();
-
-    ErrorDTO body =
-        new ErrorDTO(
-            HttpStatus.SERVICE_UNAVAILABLE,
-            ex.getMessage(),
-            servletRequest.getRequestURI(),
-            servletRequest.getMethod());
-
-    return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(body);
-  }
+  
 }
