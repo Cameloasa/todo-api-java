@@ -78,7 +78,7 @@
             <optional>true</optional>
         </dependency>
 
-                <!-- Spring Security (full) -->
+        <!-- Spring Security (full) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>

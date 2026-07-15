@@ -126,36 +126,39 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  @Transactional
-  public UserDTOView update(String email, UserDTOForm dtoForm) {
+@Transactional
+public UserDTOView update(String email, UserDTOForm dtoForm) {
     validateEmailExists(email);
 
-    @SuppressWarnings("null")
     User existingUser = userRepository.findById(email).orElseThrow();
 
-    // Update fields
     existingUser.setUsername(dtoForm.getUsername());
     existingUser.setEmail(dtoForm.getEmail());
     existingUser.setPassword(passwordEncoder.encode(dtoForm.getPassword()));
     existingUser.setExpired(dtoForm.isExpired());
 
-    // Update roles
-    @SuppressWarnings("null")
-    Set<Role> roles =
-        dtoForm.getRoleIds().stream()
-            .map(
-                roleId ->
-                    roleRepository
-                        .findById(roleId)
-                        .orElseThrow(() -> new DataNotFoundException("Role is not valid")))
-            .collect(Collectors.toSet());
-    existingUser.setRoles(roles);
+    // NU modificăm roluri aici!
 
-    // Save updated user
     User updatedUser = userRepository.save(existingUser);
-
     return userConverter.toUserDTOView(updatedUser);
-  }
+}
+
+@Transactional
+public UserDTOView updateRoles(String email, List<Long> roleIds) {
+
+    User user = userRepository.findByEmailWithRoles(email)
+        .orElseThrow(() -> new DataNotFoundException("User not found"));
+
+    Set<Role> roles = roleIds.stream()
+        .map(id -> roleRepository.findById(id)
+            .orElseThrow(() -> new DataNotFoundException("Role not found")))
+        .collect(Collectors.toSet());
+
+    user.setRoles(roles);
+
+    return userConverter.toUserDTOView(userRepository.save(user));
+}
+
 
   @SuppressWarnings("null")
   @Override
@@ -174,4 +177,6 @@ public class UserServiceImpl implements UserService {
       throw new DataNotFoundException("Email not found.");
     }
   }
+
+  
 }

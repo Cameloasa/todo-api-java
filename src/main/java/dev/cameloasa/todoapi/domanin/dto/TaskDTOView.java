@@ -15,4 +15,5 @@ public class TaskDTOView {
   private String description;
   private LocalDate deadline;
   private boolean done;
+  private Long personId;
 }

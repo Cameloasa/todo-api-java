@@ -24,6 +24,9 @@ public interface UserService {
   // Update user (email, username, roles, expired)
   UserDTOView update(String email, UserDTOForm dtoForm);
 
+  // Update user ( roles)
+  UserDTOView updateRoles(String email, List<Long> roleIds);
+
   // Delete user
   void delete(String email);
 
@@ -32,4 +35,6 @@ public interface UserService {
 
   // Enable user (expired = false)
   void enableEmail(String email);
+
+  
 }

@@ -4,23 +4,34 @@ import dev.cameloasa.todoapi.domanin.dto.LoginDTOForm;
 import dev.cameloasa.todoapi.domanin.dto.PersonDTOForm;
 import dev.cameloasa.todoapi.domanin.dto.RegisterDTOForm;
 import dev.cameloasa.todoapi.domanin.dto.UserDTOForm;
+import dev.cameloasa.todoapi.domanin.entity.Role;
+import dev.cameloasa.todoapi.repository.RoleRepository;
+
 import java.util.List;
 import org.springframework.stereotype.Component;
 
 @Component
 public class AuthConverterImpl implements AuthConverter {
 
-  private static final Long DEFAULT_ROLE_ID = 1L; // rolul USER
+  private final RoleRepository roleRepository;
 
-  @Override
-  public UserDTOForm toUserDTOForm(RegisterDTOForm dto) {
-    UserDTOForm form = new UserDTOForm();
-    form.setEmail(dto.getEmail());
-    form.setUsername(dto.getUsername());
-    form.setPassword(dto.getPassword());
-    form.setRoleIds(List.of(DEFAULT_ROLE_ID));
-    return form;
-  }
+  public AuthConverterImpl(RoleRepository roleRepository) {
+        this.roleRepository = roleRepository;
+    }
+
+    @Override
+    public UserDTOForm toUserDTOForm(RegisterDTOForm dto) {
+
+        Role userRole = roleRepository.findByName("USER")
+            .orElseThrow(() -> new RuntimeException("Default role USER not found"));
+
+        UserDTOForm form = new UserDTOForm();
+        form.setEmail(dto.getEmail());
+        form.setUsername(dto.getUsername());
+        form.setPassword(dto.getPassword());
+        form.setRoleIds(List.of(userRole.getId()));
+        return form;
+    }
 
   @Override
   public PersonDTOForm toPersonDTOForm(RegisterDTOForm dto) {
