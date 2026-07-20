@@ -41,107 +41,7 @@ JUnit testing
 
 Code formatting & linting (Spotless + Checkstyle)
 
-## 📦 Current Features
-
-**Person**.Represents a user with:
-
-```json
-id
-first name
-last name
-email
-```
-
-**TodoItem**.Represents a task with:
-
-```json
-id
-title
-description
-deadline (LocalDate)
-done status
-method isOverdue()
-```
-
-## 📁 Project Structure
-
-```text
-errors/
-img/
-scripts/
-src/
-  main/
-    java/
-      dev/cameloasa/
-        App.java
-        WebApp.java
-        db/
-          schema.sql
-          DatabaseInitializer.java
-        dao/
-          Person.java
-          TodoItem.java
-          TodoItemTask.java 
-        daoimpl/
-          Person.java
-          TodoItem.java
-          TodoItemTask.java 
-        service/
-          Person.java
-          TodoItem.java
-          TodoItemTask.java 
-        controller/
-          Person.java
-          TodoItem.java
-          TodoItemTask.java 
-        web/
-          Person.java
-          TodoItem.java
-          TodoItemTask.java 
-  test/
-    java/
-      dev/cameloasa/
-```
-
 ## 🌐 REST API Endpoints
-
-```text
-👤 Person — endpointuri REST
-🔹 CRUD
-GET /person — retun a list with people
-GET /person/{id} — 
-POST /person — create a new person
-PATCH /person/{id} — 
-DELETE /person/{id} — delete person
-
-📝 TodoItem — endpointuri REST
-🔹 CRUD
-GET /items — returnează toate item‑urile
-GET /items/{id} — returnează item‑ul cu ID‑ul dat
-POST /items — creează un item nou
-PATCH /items/{id} — update parțial pe item
-DELETE /items/{id} — șterge item‑ul
-
-🔹 Search
-GET /items/done/{status} — item‑uri finalizate / nefinalizate
-GET /items/unassigned — item‑uri fără assignee
-GET /items/overdue — item‑uri cu deadline depășit
-GET /items/deadline/{date} — item‑uri cu deadline exact
-GET /items/title/{title} — item‑uri filtrate după titlu
-
-🧩 TodoItemTask — endpointuri REST
-🔹 CRUD
-GET /tasks — returnează toate task‑urile
-GET /tasks/{id} — returnează task‑ul cu ID‑ul dat
-POST /tasks — creează un task nou
-PATCH /tasks/{id} — update parțial pe task
-DELETE /tasks/{id} — șterge task‑ul
-
-🔹 Search
-GET /tasks/todoitem/{todoItemId} — task‑uri ale unui item
-GET /tasks/done/{status} — task‑uri finalizate / nefinalizate
-GET /tasks/title/{title} — task‑uri filtrate după titlu
-```
 
 🔹The REST API will be available at:
 [http://localhost:8080]
@@ -191,14 +91,14 @@ mvn checkstyle:check
 
 ## 🚀 Future Improvements
 
-- Role & permission management
+- Role & permission management ✔
 - Session-based authentication enhancements
-- Global exception handling (ControllerAdvice)
+- Global exception handling (ControllerAdvice) ✔
 - Security headers & CORS global configuration
-- Email confirmation flow
-- Password hashing (BCrypt)
+- Email confirmation flow ✔
+- Password hashing (BCrypt) ✔
 - Docker Compose (backend + MySQL + email service)
 - Unit & integration testing (JUnit + Mockito)
 - React + TypeScript frontend
 - CI/CD pipeline with GitHub Actions
-- Environment variable support (.env, .env.development, .env.example)
+- Environment variable support (.env, .env.development, .env.example) ✔
