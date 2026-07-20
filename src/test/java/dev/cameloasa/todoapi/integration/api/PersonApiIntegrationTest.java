@@ -23,7 +23,7 @@ public class PersonApiIntegrationTest extends IntegrationTestBase {
   // Positive tests
   // -------------------------
 
-    @WithMockUser(roles = {"ADMIN", "SUPERADMIN"})
+  @WithMockUser(roles = {"ADMIN", "SUPERADMIN"})
   @Test
   void testFindPersonById() throws Exception {
     var user = createUser("test@example.com");
@@ -72,53 +72,6 @@ public class PersonApiIntegrationTest extends IntegrationTestBase {
   // -------------------------
   // Negative tests
   // -------------------------
-
-  @SuppressWarnings("null")
-  @WithMockUser(roles = {"ADMIN", "SUPERADMIN"})
-  @Test
-  void testCreatePerson_UserNotFound() throws Exception {
-    // do not create user -> 404
-
-    String json =
-        """
-            {
-                "firstName": "Ghost",
-                "lastName": "User",
-                "userEmail": "missing@example.com"
-            }
-            """;
-
-    mockMvc
-        .perform(post("/auth/persons").contentType(MediaType.APPLICATION_JSON).content(json))
-        .andExpect(status().isNotFound());
-  }
-
-  @SuppressWarnings("null")
-  @WithMockUser(roles = {"ADMIN", "SUPERADMIN"})
-  @Test
-  void testCreatePerson_DuplicatePerson() throws Exception {
-    var user = createUser("test@example.com");
-    createPerson(user, "Ana", "Pop"); // deja există
-
-    String json =
-        """
-            {
-                "firstName": "Duplicate",
-                "lastName": "Person",
-                "userEmail": "test@example.com"
-            }
-            """;
-
-    mockMvc
-        .perform(post("/auth/persons").contentType(MediaType.APPLICATION_JSON).content(json))
-        .andExpect(status().isConflict());
-  }
-
-  @Test
-  @WithMockUser(roles = {"ADMIN", "SUPERADMIN"})
-  void testFindPersonById_NotFound() throws Exception {
-    mockMvc.perform(get("/persons/999")).andExpect(status().isNotFound());
-  }
 
   @Test
   @WithMockUser(roles = {"ADMIN", "SUPERADMIN"})

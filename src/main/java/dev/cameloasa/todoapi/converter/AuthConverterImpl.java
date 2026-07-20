@@ -6,17 +6,16 @@ import dev.cameloasa.todoapi.domanin.dto.RegisterDTOForm;
 import dev.cameloasa.todoapi.domanin.dto.UserDTOForm;
 import dev.cameloasa.todoapi.domanin.entity.Role;
 import dev.cameloasa.todoapi.repository.RoleRepository;
+import lombok.RequiredArgsConstructor;
+
 import java.util.List;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class AuthConverterImpl implements AuthConverter {
 
   private final RoleRepository roleRepository;
-
-  public AuthConverterImpl(RoleRepository roleRepository) {
-    this.roleRepository = roleRepository;
-  }
 
   @Override
   public UserDTOForm toUserDTOForm(RegisterDTOForm dto) {
@@ -45,7 +44,7 @@ public class AuthConverterImpl implements AuthConverter {
 
   @Override
   public LoginDTOForm toLoginDTOForm(LoginDTOForm dto) {
-    // nu e nevoie de conversie, dar păstrăm metoda pentru consistență
+    
     return dto;
   }
 }

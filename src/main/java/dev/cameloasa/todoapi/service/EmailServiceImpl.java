@@ -62,18 +62,49 @@ public class EmailServiceImpl {
   }
 
   // ------------------------------
-  // Task created email
+  // Task notification email
   // ------------------------------
-  public void sendTaskCreatedEmail(String email, TaskDTOView task) {
-    EmailDTO dto =
-        EmailDTO.builder()
-            .to(email)
-            .subject("A new task was created")
-            .html(
-                "<p>Your task <strong>"
-                    + task.getTitle()
-                    + "</strong> was created successfully.</p>")
-            .build();
+  public void sendTaskNotification(String email, TaskDTOView task, String actionType) {
+
+    String subject;
+    String html;
+
+    switch (actionType.toLowerCase()) {
+      case "created":
+        subject = "A new task was created";
+        html =
+            "<p>Your task <strong>" + task.getTitle() + "</strong> was created successfully.</p>";
+        break;
+
+      case "updated":
+        subject = "Your task was updated";
+        html = "<p>Your task <strong>" + task.getTitle() + "</strong> was updated.</p>";
+        break;
+
+      case "deleted":
+        subject = "Your task was deleted";
+        html = "<p>Your task <strong>" + task.getTitle() + "</strong> was deleted.</p>";
+        break;
+
+      case "reassigned":
+        subject = "Task reassigned";
+        html =
+            "<p>You have been assigned a new task: <strong>" + task.getTitle() + "</strong>.</p>";
+        break;
+
+      case "unassigned":
+        subject = "Task unassigned";
+        html =
+            "<p>Your task <strong>"
+                + task.getTitle()
+                + "</strong> is no longer assigned to you.</p>";
+        break;
+
+      default:
+        throw new IllegalArgumentException("Unknown action type: " + actionType);
+    }
+
+    EmailDTO dto = EmailDTO.builder().to(email).subject(subject).html(html).build();
 
     sendEmail(dto);
   }
@@ -86,23 +117,22 @@ public class EmailServiceImpl {
     String html;
 
     if (token == null) {
-        // Admin reset — fără link
-        html = "<p>Your password has been reset by an administrator. "
-             + "If you did not request this change, please contact support immediately.</p>";
+      // Admin reset — no link
+      html =
+          "<p>Your password has been reset by an administrator. "
+              + "If you did not request this change, please contact support immediately.</p>";
     } else {
-        // User reset — cu link
-        html = "<p>Click the link to reset your password: "
-             + "<a href='https://yourapp/reset?token=" + token + "'>Reset Password</a></p>";
+      // User reset — with link
+      html =
+          "<p>Click the link to reset your password: "
+              + "<a href='https://yourapp/reset?token="
+              + token
+              + "'>Reset Password</a></p>";
     }
 
     EmailDTO dto =
-        EmailDTO.builder()
-            .to(email)
-            .subject("Password reset request")
-            .html(html)
-            .build();
+        EmailDTO.builder().to(email).subject("Password reset request").html(html).build();
 
     sendEmail(dto);
-}
-
+  }
 }

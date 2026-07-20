@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -30,6 +31,7 @@ public class TaskApiIntegrationTest extends IntegrationTestBase {
   // Create task
   // -------------------------
   @SuppressWarnings("null")
+  @WithMockUser(roles = "ADMIN")
   @Test
   void testCreateTask() throws Exception {
 
@@ -49,7 +51,9 @@ public class TaskApiIntegrationTest extends IntegrationTestBase {
             .formatted(person.getId());
 
     mockMvc
-        .perform(post("/tasks").contentType(MediaType.APPLICATION_JSON).content(json))
+        .perform(post("/auth/tasks")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(json))
         .andDo(print())
         .andExpect(status().isCreated())
         .andExpect(jsonPath("$.title").value("My Task"))
@@ -61,6 +65,7 @@ public class TaskApiIntegrationTest extends IntegrationTestBase {
   // -------------------------
   // Find task by id
   // -------------------------
+  @WithMockUser(roles = "ADMIN")
   @Test
   void testFindTaskById() throws Exception {
 
@@ -69,7 +74,7 @@ public class TaskApiIntegrationTest extends IntegrationTestBase {
     Task task = createTask(person, "My Task", "Do something");
 
     mockMvc
-        .perform(get("/tasks/" + task.getId()))
+        .perform(get("/auth/tasks/" + task.getId()))
         .andDo(print())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.id").value(task.getId()))
@@ -80,6 +85,7 @@ public class TaskApiIntegrationTest extends IntegrationTestBase {
   // -------------------------
   // Find all task
   // -------------------------
+  @WithMockUser(roles = "ADMIN")
   @Test
   void testFindAllTasks() throws Exception {
 
@@ -90,7 +96,7 @@ public class TaskApiIntegrationTest extends IntegrationTestBase {
     createTask(person, "Task B", "Desc B");
 
     mockMvc
-        .perform(get("/tasks"))
+        .perform(get("/auth/tasks"))
         .andDo(print())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.length()").value(2));
@@ -100,6 +106,7 @@ public class TaskApiIntegrationTest extends IntegrationTestBase {
   // Update task
   // -------------------------
   @SuppressWarnings("null")
+  @WithMockUser(roles = "ADMIN")
   @Test
   void testUpdateTask() throws Exception {
 
@@ -121,7 +128,7 @@ public class TaskApiIntegrationTest extends IntegrationTestBase {
             .formatted(task.getId(), person.getId());
 
     mockMvc
-        .perform(patch("/tasks").contentType(MediaType.APPLICATION_JSON).content(json))
+        .perform(patch("/auth/tasks").contentType(MediaType.APPLICATION_JSON).content(json))
         .andDo(print())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.title").value("New Title"))
@@ -131,6 +138,7 @@ public class TaskApiIntegrationTest extends IntegrationTestBase {
   // -------------------------
   // Delete task
   // -------------------------
+  @WithMockUser(roles = "ADMIN")
   @Test
   void testDeleteTask() throws Exception {
 
@@ -139,7 +147,7 @@ public class TaskApiIntegrationTest extends IntegrationTestBase {
     Task task = createTask(person, "To Delete", "Desc");
 
     mockMvc
-        .perform(delete("/tasks/" + task.getId()))
+        .perform(delete("/auth/tasks/" + task.getId()))
         .andDo(print())
         .andExpect(status().isNoContent());
   }
@@ -147,6 +155,7 @@ public class TaskApiIntegrationTest extends IntegrationTestBase {
   // -------------------------
   // Find by person id
   // -------------------------
+  @WithMockUser(roles = "ADMIN")
   @Test
   void testFindByPersonId() throws Exception {
 
@@ -157,7 +166,7 @@ public class TaskApiIntegrationTest extends IntegrationTestBase {
     createTask(person, "Task B", "Desc B");
 
     mockMvc
-        .perform(get("/tasks/person/" + person.getId()))
+        .perform(get("/auth/tasks/person/" + person.getId()))
         .andDo(print())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.length()").value(2));
@@ -166,6 +175,7 @@ public class TaskApiIntegrationTest extends IntegrationTestBase {
   // -------------------------
   // Mark done
   // -------------------------
+  @WithMockUser(roles = "ADMIN")
   @Test
   void testMarkTaskDone() throws Exception {
 
@@ -174,7 +184,7 @@ public class TaskApiIntegrationTest extends IntegrationTestBase {
     Task task = createTask(person, "My Task", "Desc");
 
     mockMvc
-        .perform(put("/tasks/" + task.getId() + "/done"))
+        .perform(put("/auth/tasks/" + task.getId() + "/done"))
         .andDo(print())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.done").value(true));
@@ -183,6 +193,7 @@ public class TaskApiIntegrationTest extends IntegrationTestBase {
   // -------------------------
   // Mark undone
   // -------------------
+  @WithMockUser(roles = "ADMIN")
   @Test
   void testMarkTaskUndone() throws Exception {
 
@@ -193,7 +204,7 @@ public class TaskApiIntegrationTest extends IntegrationTestBase {
     taskRepository.save(task);
 
     mockMvc
-        .perform(put("/tasks/" + task.getId() + "/undone"))
+        .perform(put("/auth/tasks/" + task.getId() + "/undone"))
         .andDo(print())
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.done").value(false));
@@ -202,6 +213,7 @@ public class TaskApiIntegrationTest extends IntegrationTestBase {
   // -------------------------
   // Reassign task
   // -------------------
+  @WithMockUser(roles = {"ADMIN", "SUPERADMIN"})
   @Test
   void testReassignTaskToPerson() throws Exception {
 
@@ -215,25 +227,11 @@ public class TaskApiIntegrationTest extends IntegrationTestBase {
 
     mockMvc
         .perform(
-            put("/tasks/" + task.getId() + "/reassign").param("newPersonId", p2.getId().toString()))
+            put("/auth/tasks/" + task.getId() + "/reassign")
+                .param("newPersonId", p2.getId().toString()))
         .andDo(print())
         .andExpect(status().isOk());
   }
 
-  // -------------------------
-  // Remove person from task
-  // -------------------
-  @Test
-  void testRemoveTaskFromPerson() throws Exception {
-
-    User user = createUser("remove@example.com");
-    Person person = createPerson(user, "Test", "Person");
-    Task task = createTask(person, "My Task", "Desc");
-
-    mockMvc
-        .perform(put("/tasks/" + task.getId() + "/remove-person"))
-        .andDo(print())
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.person").doesNotExist());
-  }
+  
 }

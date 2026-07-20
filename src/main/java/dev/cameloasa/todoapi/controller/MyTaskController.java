@@ -9,6 +9,7 @@ import dev.cameloasa.todoapi.service.SessionService;
 import dev.cameloasa.todoapi.service.TaskService;
 import jakarta.validation.Valid;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -26,18 +27,12 @@ import org.springframework.web.bind.annotation.RestController;
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/auth/tasks/my")
+@RequiredArgsConstructor
 public class MyTaskController {
 
   private final TaskService taskService;
   private final SessionService sessionService;
   private final PersonService personService;
-
-  public MyTaskController(
-      TaskService taskService, SessionService sessionService, PersonService personService) {
-    this.taskService = taskService;
-    this.sessionService = sessionService;
-    this.personService = personService;
-  }
 
   // ---------------------------------------------------------
   // Helper: get current personId from session token
@@ -81,10 +76,11 @@ public class MyTaskController {
   // ---------------------------------------------------------
   @PostMapping
   public ResponseEntity<TaskDTOView> createMyTask(
-      @Valid @RequestHeader("X-Session-Token") String token, @RequestBody TaskDTOForm dtoForm) {
+      @Valid @RequestHeader("X-Session-Token") String token,
+       @RequestBody TaskDTOForm dtoForm) {
 
     Long personId = getCurrentPersonId(token);
-    dtoForm.setPersonId(personId); // user creează DOAR pentru el
+    dtoForm.setPersonId(personId); //
 
     TaskDTOView created = taskService.create(dtoForm);
     return ResponseEntity.status(HttpStatus.CREATED).body(created);

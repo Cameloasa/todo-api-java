@@ -48,7 +48,7 @@ public class SessionAuthenticationFilter extends OncePerRequestFilter {
       return;
     }
 
-    // 3. Obține email-ul asociat tokenului
+    // 3. get email associat token
     String email = sessionService.getUserEmail(token);
 
     if (email == null) {
@@ -56,7 +56,7 @@ public class SessionAuthenticationFilter extends OncePerRequestFilter {
       return;
     }
 
-    // 4. Încarcă userul din DB
+    // 4. Load user din DB
     User user = userRepository.findByEmailWithRoles(email).orElse(null);
 
     if (user == null) {
@@ -64,14 +64,14 @@ public class SessionAuthenticationFilter extends OncePerRequestFilter {
       return;
     }
 
-    // 5. Creează UserPrincipal (UserDetails)
+    // 5. Create UserPrincipal (UserDetails)
     UserPrincipal principal = new UserPrincipal(user);
 
-    // 6. Creează Authentication cu rolurile userului
+    // 6. Create Authentication with user roles
     UsernamePasswordAuthenticationToken authentication =
         new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
 
-    // 7. Pune userul în SecurityContext
+    // 7. Set user in SecurityContext
     SecurityContextHolder.getContext().setAuthentication(authentication);
 
     // 8. Continuă filtrarea

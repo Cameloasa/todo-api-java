@@ -12,7 +12,10 @@ public class RoleConverterImpl implements RoleConverter {
   public RoleDTOView toRoleDTOView(Role entity) {
     if (entity == null) return null;
 
-    return RoleDTOView.builder().id(entity.getId()).name(entity.getName()).build();
+    return RoleDTOView.builder()
+    .id(entity.getId())
+    .name(entity
+      .getName()).build();
   }
 
   @Override

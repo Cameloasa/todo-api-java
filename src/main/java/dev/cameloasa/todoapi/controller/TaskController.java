@@ -1,11 +1,15 @@
 package dev.cameloasa.todoapi.controller;
 
+import dev.cameloasa.todoapi.domanin.dto.PersonDTOView;
 import dev.cameloasa.todoapi.domanin.dto.TaskDTOForm;
 import dev.cameloasa.todoapi.domanin.dto.TaskDTOView;
+import dev.cameloasa.todoapi.service.EmailServiceImpl;
+import dev.cameloasa.todoapi.service.PersonServiceImpl;
 import dev.cameloasa.todoapi.service.TaskService;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,18 +17,27 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/auth/tasks")
 @RestController
+@RequiredArgsConstructor
 public class TaskController {
 
   private final TaskService taskService;
-
-  public TaskController(TaskService taskService) {
-    this.taskService = taskService;
-  }
+  private final PersonServiceImpl personService;
+  private final EmailServiceImpl emailService;
 
   // CREATE
   @PostMapping
   public ResponseEntity<TaskDTOView> doCreate(@Valid @RequestBody TaskDTOForm dtoForm) {
     TaskDTOView responseBody = taskService.create(dtoForm);
+
+    if (responseBody.getPersonId() != null) {
+      PersonDTOView person = personService.findById(responseBody.getPersonId());
+
+      emailService.sendTaskNotification(
+        person.getUserEmail(), 
+        responseBody, 
+        "created");
+    }
+
     return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
   }
 
@@ -129,12 +142,7 @@ public class TaskController {
     return ResponseEntity.ok(responseBody);
   }
 
-  // REMOVE TASK FROM PERSON
-  @PutMapping("/{taskId}/remove-person")
-  public ResponseEntity<TaskDTOView> doRemoveTaskFromPerson(@PathVariable Long taskId) {
-    TaskDTOView responseBody = taskService.removeTaskFromPerson(taskId);
-    return ResponseEntity.ok(responseBody);
-  }
+
 
   // REASSIGN TASK TO PERSON
   @PutMapping("/{taskId}/reassign")
@@ -142,6 +150,12 @@ public class TaskController {
       @PathVariable Long taskId, @RequestParam Long newPersonId) {
 
     TaskDTOView responseBody = taskService.reassignTaskToPerson(taskId, newPersonId);
+    PersonDTOView newPerson = personService.findById(newPersonId);
+
+    emailService.sendTaskNotification(newPerson.getUserEmail(), 
+    responseBody, 
+    "reassigned");
+
     return ResponseEntity.ok(responseBody);
   }
 }

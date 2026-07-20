@@ -1,8 +1,11 @@
 package dev.cameloasa.todoapi.service;
 
-import dev.cameloasa.todoapi.converter.AuthConverter;
-import dev.cameloasa.todoapi.converter.PersonConverter;
-import dev.cameloasa.todoapi.converter.UserConverter;
+
+import dev.cameloasa.todoapi.converter.AuthConverterImpl;
+
+import dev.cameloasa.todoapi.converter.PersonConverterImpl;
+
+import dev.cameloasa.todoapi.converter.UserConverterImpl;
 import dev.cameloasa.todoapi.domanin.dto.LoginDTOForm;
 import dev.cameloasa.todoapi.domanin.dto.PersonDTOForm;
 import dev.cameloasa.todoapi.domanin.dto.PersonDTOView;
@@ -20,10 +23,8 @@ import dev.cameloasa.todoapi.repository.PersonRepository;
 import dev.cameloasa.todoapi.repository.UserRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
-
 import java.util.UUID;
-
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -34,15 +35,15 @@ public class AuthServiceImpl implements AuthService {
   private final UserServiceImpl userService;
   private final PersonServiceImpl personService;
   private final EmailServiceImpl emailService;
-  private final PasswordResetTokenRepository tokenRepository;
   private final SessionService sessionService;
 
-  private final AuthConverter authConverter;
-  private final UserConverter userConverter;
-  private final PersonConverter personConverter;
+  private final AuthConverterImpl authConverter;
+  private final UserConverterImpl userConverter;
+  private final PersonConverterImpl personConverter;
 
   private final UserRepository userRepository;
   private final PersonRepository personRepository;
+  private final PasswordResetTokenRepository tokenRepository;
 
   private final PasswordEncoder passwordEncoder;
 
@@ -195,6 +196,7 @@ public class AuthServiceImpl implements AuthService {
 
     return response;
   }
+
   public void requestPasswordReset(String email) {
 
     tokenRepository.deleteByEmail(email);
@@ -209,20 +211,18 @@ public class AuthServiceImpl implements AuthService {
     tokenRepository.save(resetToken);
 
     emailService.sendPasswordResetEmail(email, token);
-}
+  }
 
-
-public void confirmPasswordReset(String token, String newPassword) {
-    PasswordResetToken resetToken = tokenRepository.findByToken(token)
-            .orElseThrow(() -> new RuntimeException("Invalid token"));
+  public void confirmPasswordReset(String token, String newPassword) {
+    PasswordResetToken resetToken =
+        tokenRepository.findByToken(token).orElseThrow(() -> new RuntimeException("Invalid token"));
 
     if (resetToken.getExpiresAt() < System.currentTimeMillis()) {
-        throw new RuntimeException("Token expired");
+      throw new RuntimeException("Token expired");
     }
 
     userService.resetPassword(resetToken.getEmail(), newPassword);
 
     tokenRepository.delete(resetToken);
-}
-
+  }
 }

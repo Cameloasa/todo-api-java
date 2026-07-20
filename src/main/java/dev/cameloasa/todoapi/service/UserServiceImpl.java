@@ -3,18 +3,15 @@ package dev.cameloasa.todoapi.service;
 import dev.cameloasa.todoapi.converter.UserConverter;
 import dev.cameloasa.todoapi.domanin.dto.UserDTOForm;
 import dev.cameloasa.todoapi.domanin.dto.UserDTOView;
-import dev.cameloasa.todoapi.domanin.entity.PasswordResetToken;
 import dev.cameloasa.todoapi.domanin.entity.Role;
 import dev.cameloasa.todoapi.domanin.entity.User;
 import dev.cameloasa.todoapi.exception.DataDuplicateException;
 import dev.cameloasa.todoapi.exception.DataNotFoundException;
-import dev.cameloasa.todoapi.repository.PasswordResetTokenRepository;
 import dev.cameloasa.todoapi.repository.PersonRepository;
 import dev.cameloasa.todoapi.repository.RoleRepository;
 import dev.cameloasa.todoapi.repository.UserRepository;
 import java.util.List;
 import java.util.Set;
-
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,8 +25,7 @@ public class UserServiceImpl implements UserService {
   private final UserRepository userRepository;
   private final PersonRepository personRepository;
   private final RoleRepository roleRepository;
-  
-  
+
   private final UserConverter userConverter;
 
   private final PasswordEncoder passwordEncoder;
@@ -126,8 +122,8 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-@Transactional
-public UserDTOView resetPassword(String email, String newPassword) {
+  @Transactional
+  public UserDTOView resetPassword(String email, String newPassword) {
     validateEmailExists(email);
 
     User user = userRepository.findById(email).orElseThrow();
@@ -139,8 +135,7 @@ public UserDTOView resetPassword(String email, String newPassword) {
     emailService.sendPasswordResetEmail(email, null);
 
     return userConverter.toUserDTOView(user);
-}
-
+  }
 
   @Transactional
   public UserDTOView updateRoles(String email, List<Long> roleIds) {

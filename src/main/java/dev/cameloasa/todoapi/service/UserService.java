@@ -35,6 +35,4 @@ public interface UserService {
 
   // Enable user (expired = false)
   void enableEmail(String email);
-
-  
 }

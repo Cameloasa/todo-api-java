@@ -34,8 +34,7 @@ public class UserApiIntegrationTest extends IntegrationTestBase {
     createUser("test@example.com");
 
     mockMvc
-        .perform(get("/auth/users/email")
-        .param("email", "test@example.com"))
+        .perform(get("/auth/users/email").param("email", "test@example.com"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.email").value("test@example.com"))
         .andExpect(jsonPath("$.username").value("test"));
@@ -79,10 +78,8 @@ public class UserApiIntegrationTest extends IntegrationTestBase {
     createUser("test@example.com");
 
     mockMvc
-        .perform(put("/auth/users/disable")
-        .param("email", "test@example.com"))
-        .andExpect(status()
-        .isNoContent());
+        .perform(put("/auth/users/disable").param("email", "test@example.com"))
+        .andExpect(status().isNoContent());
 
     User user = userRepository.findByEmail("test@example.com").get();
     assertTrue(user.isExpired());
@@ -99,8 +96,7 @@ public class UserApiIntegrationTest extends IntegrationTestBase {
     userRepository.save(user);
 
     mockMvc
-        .perform(put("/auth/users/enable")
-        .param("email", "test@example.com"))
+        .perform(put("/auth/users/enable").param("email", "test@example.com"))
         .andExpect(status().isNoContent());
 
     User updated = userRepository.findByEmail("test@example.com").get();
@@ -111,27 +107,28 @@ public class UserApiIntegrationTest extends IntegrationTestBase {
   // Update reset password by admin test
   // ---------------------------------------------------------
   @WithMockUser(roles = {"ADMIN", "SUPERADMIN"})
-    @Test
-    void testResetPasswordByAdmin() throws Exception {
-        // Arrange: creează userul în DB
-        createUser("test@example.com");
+  @Test
+  void testResetPasswordByAdmin() throws Exception {
+    // Arrange: creează userul în DB
+    createUser("test@example.com");
 
-        String json = """
+    String json =
+        """
                 {
                     "password": "Newpass123!"
                 }
                 """;
 
-        // Act + Assert
-        mockMvc.perform(
-                patch("/auth/users/password")
-                    .param("email", "test@example.com")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(json))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.email").value("test@example.com"));
-    }
-
+    // Act + Assert
+    mockMvc
+        .perform(
+            patch("/auth/users/password")
+                .param("email", "test@example.com")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.email").value("test@example.com"));
+  }
 
   // ---------------------------------------------------------
   // Delete user test
@@ -142,8 +139,7 @@ public class UserApiIntegrationTest extends IntegrationTestBase {
     createUser("test@example.com");
 
     mockMvc
-        .perform(delete("/auth/users")
-        .param("email", "test@example.com"))
+        .perform(delete("/auth/users").param("email", "test@example.com"))
         .andExpect(status().isNoContent());
 
     assertFalse(userRepository.findByEmail("test@example.com").isPresent());
@@ -153,5 +149,4 @@ public class UserApiIntegrationTest extends IntegrationTestBase {
   // Negative tests
   // ---------------------------------------------------------
 
-  
 }
