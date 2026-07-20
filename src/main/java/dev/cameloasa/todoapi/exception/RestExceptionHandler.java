@@ -1,8 +1,6 @@
 package dev.cameloasa.todoapi.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
-
-
 import java.util.stream.Collectors;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -86,24 +84,22 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
   }
 
   // ---------------------------------------------------------
-//  403 Forbidden
-// ---------------------------------------------------------
-@ExceptionHandler(AccessDeniedException.class)
-public ResponseEntity<ErrorDTO> handleAccessDenied(
-    AccessDeniedException ex, WebRequest request) {
+  //  403 Forbidden
+  // ---------------------------------------------------------
+  @ExceptionHandler(AccessDeniedException.class)
+  public ResponseEntity<ErrorDTO> handleAccessDenied(AccessDeniedException ex, WebRequest request) {
 
-  HttpServletRequest servletRequest = ((ServletWebRequest) request).getRequest();
+    HttpServletRequest servletRequest = ((ServletWebRequest) request).getRequest();
 
-  ErrorDTO body =
-      new ErrorDTO(
-          HttpStatus.FORBIDDEN,
-          "Access denied: insufficient permissions",
-          servletRequest.getRequestURI(),
-          servletRequest.getMethod());
+    ErrorDTO body =
+        new ErrorDTO(
+            HttpStatus.FORBIDDEN,
+            "Access denied: insufficient permissions",
+            servletRequest.getRequestURI(),
+            servletRequest.getMethod());
 
-  return ResponseEntity.status(HttpStatus.FORBIDDEN).body(body);
-}
-
+    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(body);
+  }
 
   // ---------------------------------------------------------
   //  404 Not Found
@@ -177,6 +173,4 @@ public ResponseEntity<ErrorDTO> handleAccessDenied(
 
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
   }
-
-  
 }

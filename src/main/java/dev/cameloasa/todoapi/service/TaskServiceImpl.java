@@ -8,10 +8,9 @@ import dev.cameloasa.todoapi.domanin.entity.Task;
 import dev.cameloasa.todoapi.exception.DataNotFoundException;
 import dev.cameloasa.todoapi.repository.PersonRepository;
 import dev.cameloasa.todoapi.repository.TaskRepository;
-import lombok.RequiredArgsConstructor;
-
 import java.time.LocalDate;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -24,7 +23,6 @@ public class TaskServiceImpl implements TaskService {
   private final TaskRepository taskRepository;
   private final TaskConverter taskConverter;
   private final PersonRepository personRepository;
-
 
   @Override
   @Transactional
@@ -187,8 +185,8 @@ public class TaskServiceImpl implements TaskService {
             .findById(taskId)
             .orElseThrow(() -> new DataNotFoundException("Task not found"));
 
-     task.setPerson(null);
-     taskRepository.save(task);
+    task.setPerson(null);
+    taskRepository.save(task);
 
     return taskConverter.toTaskDTOView(task);
   }

@@ -4,12 +4,10 @@ import dev.cameloasa.todoapi.domanin.dto.LoginDTOForm;
 import dev.cameloasa.todoapi.domanin.dto.RegisterDTOForm;
 import dev.cameloasa.todoapi.domanin.dto.SessionResponseDTO;
 import dev.cameloasa.todoapi.service.AuthService;
-
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
 import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = "http://localhost:3000")
@@ -31,26 +29,23 @@ public class AuthController {
     SessionResponseDTO response = authService.register(dto);
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
-  
 
   // ---------------------------------------------------------
   // LOGIN → 200 OK
   // ---------------------------------------------------------
-    @PostMapping("/login")
+  @PostMapping("/login")
   public ResponseEntity<SessionResponseDTO> login(
-      @Valid @RequestBody LoginDTOForm dto,
-      HttpServletResponse response
-  ) {
-      SessionResponseDTO session = authService.login(dto, response);
-      return ResponseEntity.ok(session);
+      @Valid @RequestBody LoginDTOForm dto, HttpServletResponse response) {
+    SessionResponseDTO session = authService.login(dto, response);
+    return ResponseEntity.ok(session);
   }
 
   // ---------------------------------------------------------
   // LOGOUT → 200 OK (no body)
   // ---------------------------------------------------------
   @PostMapping("/logout")
-  public ResponseEntity<Void> logout( @RequestHeader("X-Session-Token") String sessionToken) {
-    authService.logout(sessionToken); 
+  public ResponseEntity<Void> logout(@RequestHeader("X-Session-Token") String sessionToken) {
+    authService.logout(sessionToken);
     return ResponseEntity.ok().build();
   }
 
@@ -58,7 +53,6 @@ public class AuthController {
   // ME → 200 OK
   // ---------------------------------------------------------
   @GetMapping("/me")
-
   public ResponseEntity<SessionResponseDTO> me(
       @RequestHeader("X-Session-Token") String sessionToken) {
     SessionResponseDTO response = authService.me(sessionToken);

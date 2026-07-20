@@ -1,7 +1,14 @@
 package dev.cameloasa.todoapi.controller;
 
+import dev.cameloasa.todoapi.domanin.dto.PersonDTOView;
+import dev.cameloasa.todoapi.domanin.dto.TaskDTOForm;
+import dev.cameloasa.todoapi.domanin.dto.TaskDTOView;
+import dev.cameloasa.todoapi.exception.InvalidCredentialsException;
+import dev.cameloasa.todoapi.service.PersonService;
+import dev.cameloasa.todoapi.service.SessionService;
+import dev.cameloasa.todoapi.service.TaskService;
+import jakarta.validation.Valid;
 import java.util.List;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -16,160 +23,144 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import dev.cameloasa.todoapi.domanin.dto.PersonDTOView;
-import dev.cameloasa.todoapi.domanin.dto.TaskDTOForm;
-import dev.cameloasa.todoapi.domanin.dto.TaskDTOView;
-import dev.cameloasa.todoapi.exception.InvalidCredentialsException;
-import dev.cameloasa.todoapi.service.PersonService;
-import dev.cameloasa.todoapi.service.SessionService;
-import dev.cameloasa.todoapi.service.TaskService;
-import jakarta.validation.Valid;
-
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/auth/tasks/my")
 public class MyTaskController {
 
-    private final TaskService taskService;
-    private final SessionService sessionService;
-    private final PersonService personService;
+  private final TaskService taskService;
+  private final SessionService sessionService;
+  private final PersonService personService;
 
-    public MyTaskController(TaskService taskService,
-                            SessionService sessionService,
-                            PersonService personService) {
-        this.taskService = taskService;
-        this.sessionService = sessionService;
-        this.personService = personService;
+  public MyTaskController(
+      TaskService taskService, SessionService sessionService, PersonService personService) {
+    this.taskService = taskService;
+    this.sessionService = sessionService;
+    this.personService = personService;
+  }
+
+  // ---------------------------------------------------------
+  // Helper: get current personId from session token
+  // ---------------------------------------------------------
+  private Long getCurrentPersonId(String sessionToken) {
+    String email = sessionService.getUserEmail(sessionToken);
+    PersonDTOView person = personService.findByUserEmail(email);
+    return person.getId();
+  }
+
+  // ---------------------------------------------------------
+  // GET all my tasks
+  // ---------------------------------------------------------
+  @GetMapping
+  public ResponseEntity<List<TaskDTOView>> getMyTasks(
+      @Valid @RequestHeader("X-Session-Token") String token) {
+
+    Long personId = getCurrentPersonId(token);
+    return ResponseEntity.ok(taskService.findByPersonId(personId));
+  }
+
+  // ---------------------------------------------------------
+  // GET my task by ID
+  // ---------------------------------------------------------
+  @GetMapping("/{id}")
+  public ResponseEntity<TaskDTOView> getMyTaskById(
+      @Valid @RequestHeader("X-Session-Token") String token, @PathVariable Long id) {
+
+    Long personId = getCurrentPersonId(token);
+    TaskDTOView task = taskService.findById(id);
+
+    if (!task.getPersonId().equals(personId)) {
+      throw new InvalidCredentialsException("Not your task");
     }
 
-    // ---------------------------------------------------------
-    // Helper: get current personId from session token
-    // ---------------------------------------------------------
-    private Long getCurrentPersonId(String sessionToken) {
-        String email = sessionService.getUserEmail(sessionToken);
-        PersonDTOView person = personService.findByUserEmail(email);
-        return person.getId();
+    return ResponseEntity.ok(task);
+  }
+
+  // ---------------------------------------------------------
+  // CREATE my task
+  // ---------------------------------------------------------
+  @PostMapping
+  public ResponseEntity<TaskDTOView> createMyTask(
+      @Valid @RequestHeader("X-Session-Token") String token, @RequestBody TaskDTOForm dtoForm) {
+
+    Long personId = getCurrentPersonId(token);
+    dtoForm.setPersonId(personId); // user creează DOAR pentru el
+
+    TaskDTOView created = taskService.create(dtoForm);
+    return ResponseEntity.status(HttpStatus.CREATED).body(created);
+  }
+
+  // ---------------------------------------------------------
+  // UPDATE my task
+  // ---------------------------------------------------------
+  @PatchMapping("/{id}")
+  public ResponseEntity<TaskDTOView> updateMyTask(
+      @Valid @RequestHeader("X-Session-Token") String token,
+      @PathVariable Long id,
+      @RequestBody TaskDTOForm dtoForm) {
+
+    Long personId = getCurrentPersonId(token);
+    TaskDTOView existing = taskService.findById(id);
+
+    if (!existing.getPersonId().equals(personId)) {
+      throw new InvalidCredentialsException("Not your task");
     }
 
-    // ---------------------------------------------------------
-    // GET all my tasks
-    // ---------------------------------------------------------
-    @GetMapping
-    public ResponseEntity<List<TaskDTOView>> getMyTasks(@Valid
-            @RequestHeader("X-Session-Token") String token) {
+    dtoForm.setId(id);
+    dtoForm.setPersonId(personId);
 
-        Long personId = getCurrentPersonId(token);
-        return ResponseEntity.ok(taskService.findByPersonId(personId));
+    return ResponseEntity.ok(taskService.update(dtoForm));
+  }
+
+  // ---------------------------------------------------------
+  // DELETE my task
+  // ---------------------------------------------------------
+  @DeleteMapping("/{id}")
+  public ResponseEntity<Void> deleteMyTask(
+      @Valid @RequestHeader("X-Session-Token") String token, @PathVariable Long id) {
+
+    Long personId = getCurrentPersonId(token);
+    TaskDTOView existing = taskService.findById(id);
+
+    if (!existing.getPersonId().equals(personId)) {
+      throw new InvalidCredentialsException("Not your task");
     }
 
-    // ---------------------------------------------------------
-    // GET my task by ID
-    // ---------------------------------------------------------
-    @GetMapping("/{id}")
-    public ResponseEntity<TaskDTOView> getMyTaskById(@Valid
-            @RequestHeader("X-Session-Token") String token,
-            @PathVariable Long id) {
+    taskService.delete(id);
+    return ResponseEntity.noContent().build();
+  }
 
-        Long personId = getCurrentPersonId(token);
-        TaskDTOView task = taskService.findById(id);
+  // ---------------------------------------------------------
+  // MARK DONE
+  // ---------------------------------------------------------
+  @PutMapping("/{id}/done")
+  public ResponseEntity<TaskDTOView> markDone(
+      @Valid @RequestHeader("X-Session-Token") String token, @PathVariable Long id) {
 
-        if (!task.getPersonId().equals(personId)) {
-            throw new InvalidCredentialsException("Not your task");
-        }
+    Long personId = getCurrentPersonId(token);
+    TaskDTOView task = taskService.findById(id);
 
-        return ResponseEntity.ok(task);
+    if (!task.getPersonId().equals(personId)) {
+      throw new InvalidCredentialsException("Not your task");
     }
 
-    // ---------------------------------------------------------
-    // CREATE my task
-    // ---------------------------------------------------------
-    @PostMapping
-    public ResponseEntity<TaskDTOView> createMyTask(@Valid
-            @RequestHeader("X-Session-Token") String token,
-            @RequestBody TaskDTOForm dtoForm) {
+    return ResponseEntity.ok(taskService.markDone(id));
+  }
 
-        Long personId = getCurrentPersonId(token);
-        dtoForm.setPersonId(personId); // user creează DOAR pentru el
+  // ---------------------------------------------------------
+  // MARK UNDONE
+  // ---------------------------------------------------------
+  @PutMapping("/{id}/undone")
+  public ResponseEntity<TaskDTOView> markUndone(
+      @Valid @RequestHeader("X-Session-Token") String token, @PathVariable Long id) {
 
-        TaskDTOView created = taskService.create(dtoForm);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    Long personId = getCurrentPersonId(token);
+    TaskDTOView task = taskService.findById(id);
+
+    if (!task.getPersonId().equals(personId)) {
+      throw new InvalidCredentialsException("Not your task");
     }
 
-    // ---------------------------------------------------------
-    // UPDATE my task
-    // ---------------------------------------------------------
-    @PatchMapping("/{id}")
-    public ResponseEntity<TaskDTOView> updateMyTask(@Valid
-            @RequestHeader("X-Session-Token") String token,
-            @PathVariable Long id,
-            @RequestBody TaskDTOForm dtoForm) {
-
-        Long personId = getCurrentPersonId(token);
-        TaskDTOView existing = taskService.findById(id);
-
-        if (!existing.getPersonId().equals(personId)) {
-            throw new InvalidCredentialsException("Not your task");
-        }
-
-        dtoForm.setId(id);
-        dtoForm.setPersonId(personId);
-
-        return ResponseEntity.ok(taskService.update(dtoForm));
-    }
-
-    // ---------------------------------------------------------
-    // DELETE my task
-    // ---------------------------------------------------------
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteMyTask(@Valid
-            @RequestHeader("X-Session-Token") String token,
-            @PathVariable Long id) {
-
-        Long personId = getCurrentPersonId(token);
-        TaskDTOView existing = taskService.findById(id);
-
-        if (!existing.getPersonId().equals(personId)) {
-            throw new InvalidCredentialsException("Not your task");
-        }
-
-        taskService.delete(id);
-        return ResponseEntity.noContent().build();
-    }
-
-    // ---------------------------------------------------------
-    // MARK DONE
-    // ---------------------------------------------------------
-    @PutMapping("/{id}/done")
-    public ResponseEntity<TaskDTOView> markDone(@Valid
-            @RequestHeader("X-Session-Token") String token,
-            @PathVariable Long id) {
-
-        Long personId = getCurrentPersonId(token);
-        TaskDTOView task = taskService.findById(id);
-
-        if (!task.getPersonId().equals(personId)) {
-            throw new InvalidCredentialsException("Not your task");
-        }
-
-        return ResponseEntity.ok(taskService.markDone(id));
-    }
-
-    // ---------------------------------------------------------
-    // MARK UNDONE
-    // ---------------------------------------------------------
-    @PutMapping("/{id}/undone")
-    public ResponseEntity<TaskDTOView> markUndone(@Valid
-            @RequestHeader("X-Session-Token") String token,
-            @PathVariable Long id) {
-
-        Long personId = getCurrentPersonId(token);
-        TaskDTOView task = taskService.findById(id);
-
-        if (!task.getPersonId().equals(personId)) {
-            throw new InvalidCredentialsException("Not your task");
-        }
-
-        return ResponseEntity.ok(taskService.markUndone(id));
-    }
+    return ResponseEntity.ok(taskService.markUndone(id));
+  }
 }
-

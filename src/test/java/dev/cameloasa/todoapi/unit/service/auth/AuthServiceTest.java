@@ -22,12 +22,10 @@ import dev.cameloasa.todoapi.unit.fixtures.SessionFixture;
 import dev.cameloasa.todoapi.unit.fixtures.UnitTestBase;
 import dev.cameloasa.todoapi.unit.fixtures.UserFixture;
 import jakarta.servlet.http.HttpServletResponse;
-
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest extends UnitTestBase {
@@ -60,7 +58,6 @@ class AuthServiceTest extends UnitTestBase {
 
     // email service mock
     doNothing().when(emailService).sendRegistrationEmail(anyString());
-
 
     var result = authService.register(dto);
 
@@ -103,7 +100,7 @@ class AuthServiceTest extends UnitTestBase {
   // ---------------------------------------------------------
 
   @Test
-void login_should_work() {
+  void login_should_work() {
     var dto = AuthFixture.sampleLoginForm();
     var user = AuthFixture.sampleUser();
     var person = AuthFixture.samplePerson(user);
@@ -119,10 +116,10 @@ void login_should_work() {
     var result = authService.login(dto, response);
 
     assertEquals(session.getToken(), result.getSessionToken());
-}
+  }
 
   @Test
-void login_with_valid_username_should_return_session() {
+  void login_with_valid_username_should_return_session() {
     var dto = AuthFixture.sampleLoginForm();
     var user = AuthFixture.sampleUserWithEncodedPassword();
     var person = AuthFixture.samplePerson(user);
@@ -131,58 +128,47 @@ void login_with_valid_username_should_return_session() {
     HttpServletResponse response = mock(HttpServletResponse.class);
 
     // user lookup
-    when(userRepository.findByEmail(dto.getEmail()))
-            .thenReturn(Optional.of(user));
+    when(userRepository.findByEmail(dto.getEmail())).thenReturn(Optional.of(user));
 
     // password check
-    when(passwordEncoder.matches(dto.getPassword(), user.getPassword()))
-            .thenReturn(true);
+    when(passwordEncoder.matches(dto.getPassword(), user.getPassword())).thenReturn(true);
 
     // person lookup
-    when(personRepository.findByUserEmail(user.getEmail()))
-            .thenReturn(Optional.of(person));
+    when(personRepository.findByUserEmail(user.getEmail())).thenReturn(Optional.of(person));
 
     // session creation
-    when(sessionService.createSession(user.getEmail()))
-            .thenReturn(session.getToken());
+    when(sessionService.createSession(user.getEmail())).thenReturn(session.getToken());
 
     // converters
-    when(userConverter.toUserDTOView(user))
-            .thenReturn(UserFixture.sampleUserDTOView());
+    when(userConverter.toUserDTOView(user)).thenReturn(UserFixture.sampleUserDTOView());
 
     when(personConverter.toPersonDTOView(person))
-            .thenReturn(PersonFixture.samplePersonDTOView(user));
+        .thenReturn(PersonFixture.samplePersonDTOView(user));
 
     var result = authService.login(dto, response);
 
     assertNotNull(result);
     assertEquals(session.getToken(), result.getSessionToken());
-}
+  }
 
   // ---------------------------------------------------------
   // TEST : wrong password
   // ---------------------------------------------------------
   @Test
-void login_with_wrong_password_should_throw() {
+  void login_with_wrong_password_should_throw() {
     var dto = AuthFixture.sampleLoginForm();
     var user = AuthFixture.sampleUserWithEncodedPassword();
 
     HttpServletResponse response = mock(HttpServletResponse.class);
 
     // user lookup
-    when(userRepository.findByEmail(dto.getEmail()))
-            .thenReturn(Optional.of(user));
+    when(userRepository.findByEmail(dto.getEmail())).thenReturn(Optional.of(user));
 
     // password check → WRONG PASSWORD
-    when(passwordEncoder.matches(dto.getPassword(), user.getPassword()))
-            .thenReturn(false);
+    when(passwordEncoder.matches(dto.getPassword(), user.getPassword())).thenReturn(false);
 
-    assertThrows(InvalidCredentialsException.class,
-            () -> authService.login(dto, response));
-}
-
-
-  
+    assertThrows(InvalidCredentialsException.class, () -> authService.login(dto, response));
+  }
 
   // ---------------------------------------------------------
   // TEST : me expired session

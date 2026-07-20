@@ -90,6 +90,14 @@
             <artifactId>spring-security-config</artifactId>
         </dependency>
 
+        <!-- test security -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+
 
         <!-- Spring Security Crypto: BCryptPasswordEncoder, hashing, crypto utils -->
         <dependency>

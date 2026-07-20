@@ -3,17 +3,15 @@ package dev.cameloasa.todoapi.integration.api;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import dev.cameloasa.todoapi.domanin.entity.User;
-import dev.cameloasa.todoapi.service.EmailServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -24,50 +22,19 @@ public class UserApiIntegrationTest extends IntegrationTestBase {
 
   @Autowired private MockMvc mockMvc;
 
-  @MockBean private EmailServiceImpl emailService;
-
   // ---------------------------------------------------------
   // Positive tests
   // ---------------------------------------------------------
   // ---------------------------------------------------------
-  // Register User Test
-  // ---------------------------------------------------------
-
-  @SuppressWarnings("null")
-  @Test
-  void testRegisterUser() throws Exception {
-
-    Long userRoleId = roleRepository.findByName("USER").get().getId();
-
-    String json =
-        """
-            {
-                "email": "test@example.com",
-                "username": "testuser",
-                "password": "Password123#",
-                "roleIds": [%d]
-            }
-            """
-            .formatted(userRoleId);
-
-    mockMvc
-        .perform(post("/users").contentType(MediaType.APPLICATION_JSON_VALUE).content(json))
-        .andDo(print())
-        .andExpect(status().isCreated())
-        .andExpect(jsonPath("$.email").value("test@example.com"))
-        .andExpect(jsonPath("$.username").value("testuser"))
-        .andExpect(jsonPath("$.roles[0].name").value("USER"));
-  }
-
-  // ---------------------------------------------------------
   // Get user by email test
   // ---------------------------------------------------------
+  @WithMockUser(roles = "USER")
   @Test
   void testGetUserByEmail() throws Exception {
     createUser("test@example.com");
 
     mockMvc
-        .perform(get("/users").param("email", "test@example.com"))
+        .perform(get("/auth/users").param("email", "test@example.com"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.email").value("test@example.com"))
         .andExpect(jsonPath("$.username").value("test"));
@@ -76,12 +43,13 @@ public class UserApiIntegrationTest extends IntegrationTestBase {
   // ---------------------------------------------------------
   // Get user by username test
   // ---------------------------------------------------------
+  @WithMockUser(roles = "USER")
   @Test
   void testGetUserByUsername() throws Exception {
     var user = createUser("test@example.com");
 
     mockMvc
-        .perform(get("/users/username").param("username", user.getUsername()))
+        .perform(get("/auth/users/username").param("username", user.getUsername()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.email").value("test@example.com"))
         .andExpect(jsonPath("$.username").value(user.getUsername()));
@@ -90,12 +58,13 @@ public class UserApiIntegrationTest extends IntegrationTestBase {
   // ---------------------------------------------------------
   // Get all users test
   // ---------------------------------------------------------
+  @WithMockUser(roles = "USER")
   @Test
   void testGetAllUsers() throws Exception {
     createUser("test@example.com");
 
     mockMvc
-        .perform(get("/users/all"))
+        .perform(get("/auth/users/all"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.length()").value(1));
   }

@@ -28,7 +28,7 @@ public class AuthFixture {
 
   public static LoginDTOForm sampleLoginForm() {
     LoginDTOForm dto = new LoginDTOForm();
-    
+
     dto.setPassword("Password123!");
     return dto;
   }

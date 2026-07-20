@@ -3,7 +3,6 @@ package dev.cameloasa.todoapi.service;
 import dev.cameloasa.todoapi.converter.AuthConverter;
 import dev.cameloasa.todoapi.converter.PersonConverter;
 import dev.cameloasa.todoapi.converter.UserConverter;
-
 import dev.cameloasa.todoapi.domanin.dto.LoginDTOForm;
 import dev.cameloasa.todoapi.domanin.dto.PersonDTOForm;
 import dev.cameloasa.todoapi.domanin.dto.PersonDTOView;
@@ -11,24 +10,17 @@ import dev.cameloasa.todoapi.domanin.dto.RegisterDTOForm;
 import dev.cameloasa.todoapi.domanin.dto.SessionResponseDTO;
 import dev.cameloasa.todoapi.domanin.dto.UserDTOForm;
 import dev.cameloasa.todoapi.domanin.dto.UserDTOView;
-
 import dev.cameloasa.todoapi.domanin.entity.SessionEntity;
 import dev.cameloasa.todoapi.domanin.entity.User;
-
 import dev.cameloasa.todoapi.exception.DataNotFoundException;
 import dev.cameloasa.todoapi.exception.InvalidCredentialsException;
-
 import dev.cameloasa.todoapi.repository.PersonRepository;
 import dev.cameloasa.todoapi.repository.UserRepository;
-
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
-
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import lombok.RequiredArgsConstructor;
-
 
 @Service
 @RequiredArgsConstructor
@@ -47,30 +39,30 @@ public class AuthServiceImpl implements AuthService {
   private final PersonRepository personRepository;
 
   private final PasswordEncoder passwordEncoder;
-  
 
   // ---------------------------------------------------------
   // Helpers (Login Me + Session)
   // ---------------------------------------------------------
 
   private void addSessionCookie(HttpServletResponse response, String token) {
-        Cookie cookie = new Cookie("session_token", token);
-        cookie.setHttpOnly(true);
-        cookie.setPath("/");
-        cookie.setMaxAge(60 * 60 * 24);
-        response.addCookie(cookie);
-    }
+    Cookie cookie = new Cookie("session_token", token);
+    cookie.setHttpOnly(true);
+    cookie.setPath("/");
+    cookie.setMaxAge(60 * 60 * 24);
+    response.addCookie(cookie);
+  }
 
   private UserDTOView safeFindUserByEmail(String email) {
-    return userRepository.findByEmail(email)
-        .map(userConverter::toUserDTOView)
-        .orElse(null);
-}
-  private PersonDTOView safeFindPersonByEmail(String email) {
-      return personRepository.findByUserEmail(email)
-          .map(personConverter::toPersonDTOView)
-          .orElse(null);
+    return userRepository.findByEmail(email).map(userConverter::toUserDTOView).orElse(null);
   }
+
+  private PersonDTOView safeFindPersonByEmail(String email) {
+    return personRepository
+        .findByUserEmail(email)
+        .map(personConverter::toPersonDTOView)
+        .orElse(null);
+  }
+
   // ---------------------------------------------------------
   // Register (User + Person + Session)
   // ---------------------------------------------------------
@@ -111,14 +103,16 @@ public class AuthServiceImpl implements AuthService {
   @Override
   public SessionResponseDTO login(LoginDTOForm dto, HttpServletResponse response) {
 
-      // 1. Find user by email
-      User user = userRepository.findByEmail(dto.getEmail())
-              .orElseThrow(() -> new InvalidCredentialsException("Invalid email or password"));
+    // 1. Find user by email
+    User user =
+        userRepository
+            .findByEmail(dto.getEmail())
+            .orElseThrow(() -> new InvalidCredentialsException("Invalid email or password"));
 
-      // 2. Verify password
-      if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
-          throw new InvalidCredentialsException("Invalid email or password");
-      }
+    // 2. Verify password
+    if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
+      throw new InvalidCredentialsException("Invalid email or password");
+    }
 
     // 3. Find person
     PersonDTOView person = personService.findByUserEmail(user.getEmail());
@@ -137,22 +131,20 @@ public class AuthServiceImpl implements AuthService {
     session.setSuccess(true);
 
     return session;
-}
+  }
 
   // ---------------------------------------------------------
   // Logout
   // ---------------------------------------------------------
   @Override
-    public void logout(String sessionToken) {
-      
-      if (!sessionService.isValid(sessionToken)) {
-        throw new InvalidCredentialsException("Session not found");
-      }
+  public void logout(String sessionToken) {
 
-      sessionService.deleteSession(sessionToken);
+    if (!sessionService.isValid(sessionToken)) {
+      throw new InvalidCredentialsException("Session not found");
     }
 
-  
+    sessionService.deleteSession(sessionToken);
+  }
 
   // ---------------------------------------------------------
   // Me (User + Person + Session)
@@ -160,49 +152,41 @@ public class AuthServiceImpl implements AuthService {
   @Override
   public SessionResponseDTO me(String sessionToken) {
 
-      // 1. Validate token presence
-      if (sessionToken == null || sessionToken.isBlank()) {
-          throw new InvalidCredentialsException("Session token is required");
-      }
+    // 1. Validate token presence
+    if (sessionToken == null || sessionToken.isBlank()) {
+      throw new InvalidCredentialsException("Session token is required");
+    }
 
-      // 2. Fetch session object
-      SessionEntity session =
-          sessionService
-              .getSession(sessionToken)
-              .orElseThrow(() -> new InvalidCredentialsException("Invalid session token"));
+    // 2. Fetch session object
+    SessionEntity session =
+        sessionService
+            .getSession(sessionToken)
+            .orElseThrow(() -> new InvalidCredentialsException("Invalid session token"));
 
+    // 3. Validate session (expired, revoked, etc.)
+    if (!sessionService.isValid(sessionToken)) {
+      throw new InvalidCredentialsException("Session expired");
+    }
 
-      // 3. Validate session (expired, revoked, etc.)
-      if (!sessionService.isValid(sessionToken)) {
-          throw new InvalidCredentialsException("Session expired");
-      }
+    // 4. Extract email from session
+    String email = session.getUserEmail();
 
-      // 4. Extract email from session
-      String email = session.getUserEmail();
-    
+    // 3. Fetch user safely
 
-      // 3. Fetch user safely
-    
-      UserDTOView user = safeFindUserByEmail(email);
-      if (user == null) 
-          throw new InvalidCredentialsException("User not found");
-      
+    UserDTOView user = safeFindUserByEmail(email);
+    if (user == null) throw new InvalidCredentialsException("User not found");
 
     // 4. Fetch person safely (optional)
     PersonDTOView person = safeFindPersonByEmail(email);
-      if (person == null) 
-          throw new DataNotFoundException(email);
-      
+    if (person == null) throw new DataNotFoundException(email);
 
-      // 7. Build response
-      SessionResponseDTO response = new SessionResponseDTO();
-      response.setSessionToken(sessionToken);
-      response.setUser(user);
-      response.setPerson(person);
-      response.setSuccess(true);
+    // 7. Build response
+    SessionResponseDTO response = new SessionResponseDTO();
+    response.setSessionToken(sessionToken);
+    response.setUser(user);
+    response.setPerson(person);
+    response.setSuccess(true);
 
-      return response;
+    return response;
   }
-
-
 }

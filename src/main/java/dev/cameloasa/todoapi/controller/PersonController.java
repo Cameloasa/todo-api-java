@@ -2,8 +2,8 @@ package dev.cameloasa.todoapi.controller;
 
 import dev.cameloasa.todoapi.domanin.dto.*;
 import dev.cameloasa.todoapi.service.PersonService;
-import java.util.List;
 import jakarta.validation.Valid;
+import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,7 +17,8 @@ public class PersonController {
   public PersonController(PersonService personService) {
     this.personService = personService;
   }
-   // admin has acces to endpoints
+
+  // admin has acces to endpoints
   // FIND BY ID
   @GetMapping("/{id}")
   public ResponseEntity<PersonDTOView> doFindPersonById(@Valid @PathVariable Long id) {
@@ -55,14 +56,16 @@ public class PersonController {
 
   // SEARCH BY FIRST NAME
   @GetMapping("/search/first-name/{firstName}")
-  public ResponseEntity<List<PersonDTOView>> doSearchByFirstName(@Valid @PathVariable String firstName) {
+  public ResponseEntity<List<PersonDTOView>> doSearchByFirstName(
+      @Valid @PathVariable String firstName) {
     List<PersonDTOView> responseBody = personService.searchByFirstName(firstName);
     return ResponseEntity.ok(responseBody);
   }
 
   // SEARCH BY LAST NAME
   @GetMapping("/search/last-name/{lastName}")
-  public ResponseEntity<List<PersonDTOView>> doSearchByLastName(@Valid @PathVariable String lastName) {
+  public ResponseEntity<List<PersonDTOView>> doSearchByLastName(
+      @Valid @PathVariable String lastName) {
     List<PersonDTOView> responseBody = personService.searchByLastName(lastName);
     return ResponseEntity.ok(responseBody);
   }

@@ -1,24 +1,19 @@
 package dev.cameloasa.todoapi.service;
 
 import dev.cameloasa.todoapi.converter.UserConverter;
-
 import dev.cameloasa.todoapi.domanin.dto.UserDTOForm;
 import dev.cameloasa.todoapi.domanin.dto.UserDTOView;
 import dev.cameloasa.todoapi.domanin.entity.Role;
 import dev.cameloasa.todoapi.domanin.entity.User;
-
+import dev.cameloasa.todoapi.exception.DataDuplicateException;
+import dev.cameloasa.todoapi.exception.DataNotFoundException;
 import dev.cameloasa.todoapi.repository.PersonRepository;
 import dev.cameloasa.todoapi.repository.RoleRepository;
 import dev.cameloasa.todoapi.repository.UserRepository;
-
-import dev.cameloasa.todoapi.exception.DataDuplicateException;
-import dev.cameloasa.todoapi.exception.DataNotFoundException;
-
-import lombok.RequiredArgsConstructor;
-
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +28,6 @@ public class UserServiceImpl implements UserService {
   private final PasswordEncoder passwordEncoder;
   private final UserConverter userConverter;
 
-
   @Override
   @Transactional
   public UserDTOView register(UserDTOForm dtoForm) {
@@ -46,7 +40,7 @@ public class UserServiceImpl implements UserService {
       throw new DataDuplicateException("Email already exists");
     }
 
-     if (userRepository.existsByUsername(dtoForm.getUsername())) {
+    if (userRepository.existsByUsername(dtoForm.getUsername())) {
       throw new DataDuplicateException("Username already exists");
     }
 
@@ -125,8 +119,8 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-@Transactional
-public UserDTOView update(String email, UserDTOForm dtoForm) {
+  @Transactional
+  public UserDTOView update(String email, UserDTOForm dtoForm) {
     validateEmailExists(email);
 
     User existingUser = userRepository.findById(email).orElseThrow();
@@ -140,24 +134,29 @@ public UserDTOView update(String email, UserDTOForm dtoForm) {
 
     User updatedUser = userRepository.save(existingUser);
     return userConverter.toUserDTOView(updatedUser);
-}
+  }
 
-@Transactional
-public UserDTOView updateRoles(String email, List<Long> roleIds) {
+  @Transactional
+  public UserDTOView updateRoles(String email, List<Long> roleIds) {
 
-    User user = userRepository.findByEmailWithRoles(email)
-        .orElseThrow(() -> new DataNotFoundException("User not found"));
+    User user =
+        userRepository
+            .findByEmailWithRoles(email)
+            .orElseThrow(() -> new DataNotFoundException("User not found"));
 
-    Set<Role> roles = roleIds.stream()
-        .map(id -> roleRepository.findById(id)
-            .orElseThrow(() -> new DataNotFoundException("Role not found")))
-        .collect(Collectors.toSet());
+    Set<Role> roles =
+        roleIds.stream()
+            .map(
+                id ->
+                    roleRepository
+                        .findById(id)
+                        .orElseThrow(() -> new DataNotFoundException("Role not found")))
+            .collect(Collectors.toSet());
 
     user.setRoles(roles);
 
     return userConverter.toUserDTOView(userRepository.save(user));
-}
-
+  }
 
   @SuppressWarnings("null")
   @Override
@@ -176,6 +175,4 @@ public UserDTOView updateRoles(String email, List<Long> roleIds) {
       throw new DataNotFoundException("Email not found.");
     }
   }
-
-  
 }

@@ -7,5 +7,6 @@ import java.util.List;
 public interface RoleService {
 
   RoleDTOView create(RoleDTOForm dtoForm);
+
   List<RoleDTOView> getAll();
 }

@@ -9,10 +9,9 @@ import dev.cameloasa.todoapi.exception.DataDuplicateException;
 import dev.cameloasa.todoapi.exception.DataNotFoundException;
 import dev.cameloasa.todoapi.repository.PersonRepository;
 import dev.cameloasa.todoapi.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
-
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,8 +23,6 @@ public class PersonServiceImpl implements PersonService {
   private final PersonRepository personRepository;
   private final PersonConverter personConverter;
   private final UserRepository userRepository;
-
-
 
   @Override
   @Transactional
