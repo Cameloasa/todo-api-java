@@ -10,15 +10,20 @@ import dev.cameloasa.todoapi.domanin.dto.RegisterDTOForm;
 import dev.cameloasa.todoapi.domanin.dto.SessionResponseDTO;
 import dev.cameloasa.todoapi.domanin.dto.UserDTOForm;
 import dev.cameloasa.todoapi.domanin.dto.UserDTOView;
+import dev.cameloasa.todoapi.domanin.entity.PasswordResetToken;
 import dev.cameloasa.todoapi.domanin.entity.SessionEntity;
 import dev.cameloasa.todoapi.domanin.entity.User;
 import dev.cameloasa.todoapi.exception.DataNotFoundException;
 import dev.cameloasa.todoapi.exception.InvalidCredentialsException;
+import dev.cameloasa.todoapi.repository.PasswordResetTokenRepository;
 import dev.cameloasa.todoapi.repository.PersonRepository;
 import dev.cameloasa.todoapi.repository.UserRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+
+import java.util.UUID;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +34,7 @@ public class AuthServiceImpl implements AuthService {
   private final UserServiceImpl userService;
   private final PersonServiceImpl personService;
   private final EmailServiceImpl emailService;
+  private final PasswordResetTokenRepository tokenRepository;
   private final SessionService sessionService;
 
   private final AuthConverter authConverter;
@@ -189,4 +195,34 @@ public class AuthServiceImpl implements AuthService {
 
     return response;
   }
+  public void requestPasswordReset(String email) {
+
+    tokenRepository.deleteByEmail(email);
+
+    String token = UUID.randomUUID().toString();
+
+    PasswordResetToken resetToken = new PasswordResetToken();
+    resetToken.setToken(token);
+    resetToken.setEmail(email);
+    resetToken.setExpiresAt(System.currentTimeMillis() + 1000L * 60 * 30);
+
+    tokenRepository.save(resetToken);
+
+    emailService.sendPasswordResetEmail(email, token);
+}
+
+
+public void confirmPasswordReset(String token, String newPassword) {
+    PasswordResetToken resetToken = tokenRepository.findByToken(token)
+            .orElseThrow(() -> new RuntimeException("Invalid token"));
+
+    if (resetToken.getExpiresAt() < System.currentTimeMillis()) {
+        throw new RuntimeException("Token expired");
+    }
+
+    userService.resetPassword(resetToken.getEmail(), newPassword);
+
+    tokenRepository.delete(resetToken);
+}
+
 }

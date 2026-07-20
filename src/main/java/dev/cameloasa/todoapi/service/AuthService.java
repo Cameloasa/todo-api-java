@@ -14,4 +14,8 @@ public interface AuthService {
   void logout(String sessionToken);
 
   SessionResponseDTO me(String sessionToken);
+
+  void requestPasswordReset(String email);
+
+  void confirmPasswordReset(String token, String newPassword);
 }

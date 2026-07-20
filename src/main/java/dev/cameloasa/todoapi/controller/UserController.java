@@ -1,6 +1,7 @@
 package dev.cameloasa.todoapi.controller;
 
-import dev.cameloasa.todoapi.domanin.dto.UserDTOForm;
+import dev.cameloasa.todoapi.domanin.dto.PasswordResetForm;
+
 import dev.cameloasa.todoapi.domanin.dto.UserDTOView;
 import dev.cameloasa.todoapi.service.UserService;
 import jakarta.validation.Valid;
@@ -56,10 +57,12 @@ public class UserController {
   }
 
   @PreAuthorize("hasAnyRole('ADMIN','SUPERADMIN')")
-  @PatchMapping
-  public ResponseEntity<UserDTOView> update(
-      @RequestParam String email, @RequestBody @Valid UserDTOForm dtoForm) {
-    return ResponseEntity.ok(userService.update(email, dtoForm));
+  @PatchMapping("/password")
+  public ResponseEntity<UserDTOView> resetPasswordByAdmin(
+          @RequestParam String email,
+          @RequestBody @Valid PasswordResetForm form) {
+
+      return ResponseEntity.ok(userService.resetPassword(email, form.getPassword()));
   }
 
   @PreAuthorize("hasAnyRole('ADMIN','SUPERADMIN')")

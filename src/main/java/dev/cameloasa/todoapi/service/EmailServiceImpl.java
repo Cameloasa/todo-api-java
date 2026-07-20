@@ -82,16 +82,27 @@ public class EmailServiceImpl {
   // Password reset email
   // ------------------------------
   public void sendPasswordResetEmail(String email, String token) {
+
+    String html;
+
+    if (token == null) {
+        // Admin reset — fără link
+        html = "<p>Your password has been reset by an administrator. "
+             + "If you did not request this change, please contact support immediately.</p>";
+    } else {
+        // User reset — cu link
+        html = "<p>Click the link to reset your password: "
+             + "<a href='https://yourapp/reset?token=" + token + "'>Reset Password</a></p>";
+    }
+
     EmailDTO dto =
         EmailDTO.builder()
             .to(email)
             .subject("Password reset request")
-            .html(
-                "<p>Click the link to reset your password: <a href='https://yourapp/reset?token="
-                    + token
-                    + "'>Reset Password</a></p>")
+            .html(html)
             .build();
 
     sendEmail(dto);
-  }
+}
+
 }

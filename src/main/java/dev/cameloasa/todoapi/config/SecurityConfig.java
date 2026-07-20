@@ -45,7 +45,12 @@ public class SecurityConfig {
                 auth
 
                     // Public endpoints
-                    .requestMatchers("/auth/register", "/auth/login", "/auth/logout", "/auth/me")
+                    .requestMatchers("/auth/register",
+                       "/auth/login", 
+                       "/auth/logout", 
+                       "/auth/me",
+                      "/auth/reset-password/request",
+                      "/auth/reset-password/confirm")
                     .permitAll()
 
                     // SUPERADMIN: create roles
@@ -77,6 +82,9 @@ public class SecurityConfig {
                     .hasRole("ADMIN")
                     .requestMatchers("/auth/users")
                     .hasRole("ADMIN") // PATCH + DELETE
+                    .requestMatchers("/auth/users/password")
+                    .hasRole("ADMIN")
+
 
                     // USER + ADMIN: can view tasks
                     .requestMatchers("/auth/tasks/my/**")

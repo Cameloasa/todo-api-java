@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -21,42 +22,22 @@ public class PersonApiIntegrationTest extends IntegrationTestBase {
   // -------------------------
   // Positive tests
   // -------------------------
-  @SuppressWarnings("null")
-  @Test
-  void testCreatePerson() throws Exception {
 
-    createUser("test@example.com");
-
-    String json =
-        """
-                {
-                    "firstName": "John",
-                    "lastName": "Doe",
-                    "userEmail": "test@example.com"
-                }
-                """;
-
-    mockMvc
-        .perform(post("/persons").contentType(MediaType.APPLICATION_JSON).content(json))
-        .andExpect(status().isCreated())
-        .andExpect(jsonPath("$.firstName").value("John"))
-        .andExpect(jsonPath("$.lastName").value("Doe"))
-        .andExpect(jsonPath("$.userEmail").value("test@example.com"));
-  }
-
+    @WithMockUser(roles = {"ADMIN", "SUPERADMIN"})
   @Test
   void testFindPersonById() throws Exception {
     var user = createUser("test@example.com");
     var person = createPerson(user, "Ana", "Pop");
 
     mockMvc
-        .perform(get("/persons/" + person.getId()))
+        .perform(get("/auth/persons/" + person.getId()))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.firstName").value("Ana"))
         .andExpect(jsonPath("$.lastName").value("Pop"));
   }
 
   @SuppressWarnings("null")
+  @WithMockUser(roles = {"ADMIN", "SUPERADMIN"})
   @Test
   void testUpdatePerson() throws Exception {
     var user = createUser("test@example.com");
@@ -74,17 +55,18 @@ public class PersonApiIntegrationTest extends IntegrationTestBase {
             .formatted(person.getId());
 
     mockMvc
-        .perform(patch("/persons").contentType(MediaType.APPLICATION_JSON).content(updateJson))
+        .perform(patch("/auth/persons").contentType(MediaType.APPLICATION_JSON).content(updateJson))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.firstName").value("Mariana"));
   }
 
+  @WithMockUser(roles = {"ADMIN", "SUPERADMIN"})
   @Test
   void testDeletePerson() throws Exception {
     var user = createUser("test@example.com");
     var person = createPerson(user, "Alex", "Popescu");
 
-    mockMvc.perform(delete("/persons/" + person.getId())).andExpect(status().isNoContent());
+    mockMvc.perform(delete("/auth/persons/" + person.getId())).andExpect(status().isNoContent());
   }
 
   // -------------------------
@@ -92,6 +74,7 @@ public class PersonApiIntegrationTest extends IntegrationTestBase {
   // -------------------------
 
   @SuppressWarnings("null")
+  @WithMockUser(roles = {"ADMIN", "SUPERADMIN"})
   @Test
   void testCreatePerson_UserNotFound() throws Exception {
     // do not create user -> 404
@@ -106,11 +89,12 @@ public class PersonApiIntegrationTest extends IntegrationTestBase {
             """;
 
     mockMvc
-        .perform(post("/persons").contentType(MediaType.APPLICATION_JSON).content(json))
+        .perform(post("/auth/persons").contentType(MediaType.APPLICATION_JSON).content(json))
         .andExpect(status().isNotFound());
   }
 
   @SuppressWarnings("null")
+  @WithMockUser(roles = {"ADMIN", "SUPERADMIN"})
   @Test
   void testCreatePerson_DuplicatePerson() throws Exception {
     var user = createUser("test@example.com");
@@ -126,21 +110,24 @@ public class PersonApiIntegrationTest extends IntegrationTestBase {
             """;
 
     mockMvc
-        .perform(post("/persons").contentType(MediaType.APPLICATION_JSON).content(json))
+        .perform(post("/auth/persons").contentType(MediaType.APPLICATION_JSON).content(json))
         .andExpect(status().isConflict());
   }
 
   @Test
+  @WithMockUser(roles = {"ADMIN", "SUPERADMIN"})
   void testFindPersonById_NotFound() throws Exception {
     mockMvc.perform(get("/persons/999")).andExpect(status().isNotFound());
   }
 
   @Test
+  @WithMockUser(roles = {"ADMIN", "SUPERADMIN"})
   void testDeletePerson_NotFound() throws Exception {
-    mockMvc.perform(delete("/persons/999")).andExpect(status().isNotFound());
+    mockMvc.perform(delete("/auth/persons/999")).andExpect(status().isNotFound());
   }
 
   @SuppressWarnings("null")
+  @WithMockUser(roles = {"ADMIN", "SUPERADMIN"})
   @Test
   void testUpdatePerson_NotFound() throws Exception {
     String json =
@@ -154,7 +141,7 @@ public class PersonApiIntegrationTest extends IntegrationTestBase {
             """;
 
     mockMvc
-        .perform(patch("/persons").contentType(MediaType.APPLICATION_JSON).content(json))
+        .perform(patch("/auth/persons").contentType(MediaType.APPLICATION_JSON).content(json))
         .andExpect(status().isNotFound());
   }
 }

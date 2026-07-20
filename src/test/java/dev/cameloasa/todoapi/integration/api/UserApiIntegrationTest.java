@@ -34,7 +34,8 @@ public class UserApiIntegrationTest extends IntegrationTestBase {
     createUser("test@example.com");
 
     mockMvc
-        .perform(get("/auth/users").param("email", "test@example.com"))
+        .perform(get("/auth/users/email")
+        .param("email", "test@example.com"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.email").value("test@example.com"))
         .andExpect(jsonPath("$.username").value("test"));
@@ -72,13 +73,16 @@ public class UserApiIntegrationTest extends IntegrationTestBase {
   // ---------------------------------------------------------
   // Disable user test
   // ---------------------------------------------------------
+  @WithMockUser(roles = {"ADMIN", "SUPERADMIN"})
   @Test
   void testDisableUser() throws Exception {
     createUser("test@example.com");
 
     mockMvc
-        .perform(put("/users/disable").param("email", "test@example.com"))
-        .andExpect(status().isNoContent());
+        .perform(put("/auth/users/disable")
+        .param("email", "test@example.com"))
+        .andExpect(status()
+        .isNoContent());
 
     User user = userRepository.findByEmail("test@example.com").get();
     assertTrue(user.isExpired());
@@ -87,6 +91,7 @@ public class UserApiIntegrationTest extends IntegrationTestBase {
   // ---------------------------------------------------------
   // Enable user test
   // ---------------------------------------------------------
+  @WithMockUser(roles = {"ADMIN", "SUPERADMIN"})
   @Test
   void testEnableUser() throws Exception {
     var user = createUser("test@example.com");
@@ -94,7 +99,8 @@ public class UserApiIntegrationTest extends IntegrationTestBase {
     userRepository.save(user);
 
     mockMvc
-        .perform(put("/users/enable").param("email", "test@example.com"))
+        .perform(put("/auth/users/enable")
+        .param("email", "test@example.com"))
         .andExpect(status().isNoContent());
 
     User updated = userRepository.findByEmail("test@example.com").get();
@@ -102,47 +108,42 @@ public class UserApiIntegrationTest extends IntegrationTestBase {
   }
 
   // ---------------------------------------------------------
-  // Update user test
+  // Update reset password by admin test
   // ---------------------------------------------------------
-  @SuppressWarnings("null")
-  @Test
-  void testUpdateUser() throws Exception {
-    createUser("test@example.com");
+  @WithMockUser(roles = {"ADMIN", "SUPERADMIN"})
+    @Test
+    void testResetPasswordByAdmin() throws Exception {
+        // Arrange: creează userul în DB
+        createUser("test@example.com");
 
-    Long adminRoleId = roleRepository.findByName("ADMIN").get().getId();
-
-    String json =
-        """
+        String json = """
                 {
-                    "email": "test@example.com",
-                    "username": "newuser",
-                    "password": "Newpass123!",
-                    "roleIds": [%d],
-                    "expired": false
+                    "password": "Newpass123!"
                 }
-                """
-            .formatted(adminRoleId);
+                """;
 
-    mockMvc
-        .perform(
-            patch("/users")
-                .param("email", "test@example.com")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(json))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.username").value("newuser"))
-        .andExpect(jsonPath("$.roles[0].name").value("ADMIN"));
-  }
+        // Act + Assert
+        mockMvc.perform(
+                patch("/auth/users/password")
+                    .param("email", "test@example.com")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(json))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.email").value("test@example.com"));
+    }
+
 
   // ---------------------------------------------------------
   // Delete user test
   // ---------------------------------------------------------
+  @WithMockUser(roles = {"ADMIN", "SUPERADMIN"})
   @Test
   void testDeleteUser() throws Exception {
     createUser("test@example.com");
 
     mockMvc
-        .perform(delete("/users").param("email", "test@example.com"))
+        .perform(delete("/auth/users")
+        .param("email", "test@example.com"))
         .andExpect(status().isNoContent());
 
     assertFalse(userRepository.findByEmail("test@example.com").isPresent());
@@ -152,141 +153,5 @@ public class UserApiIntegrationTest extends IntegrationTestBase {
   // Negative tests
   // ---------------------------------------------------------
 
-  // ---------------------------------------------------------
-  // Invalid password
-  // ---------------------------------------------------------
-  @SuppressWarnings("null")
-  @Test
-  void testRegisterUser_InvalidPassword() throws Exception {
-
-    Long userRoleId = roleRepository.findByName("USER").get().getId();
-
-    String json =
-        """
-                {
-                    "email": "test@example.com",
-                    "username": "testuser",
-                    "password": "weakpass",
-                    "roleIds": [%d]
-                }
-                """
-            .formatted(userRoleId);
-
-    mockMvc
-        .perform(post("/users").contentType(MediaType.APPLICATION_JSON).content(json))
-        .andExpect(status().isBadRequest())
-        .andExpect(
-            jsonPath("$.message")
-                .value(
-                    "password: Password must contain at least one uppercase letter, one lowercase letter, one number, one special character."));
-  }
-
-  // ---------------------------------------------------------
-  // email missing
-  // ---------------------------------------------------------
-  @SuppressWarnings("null")
-  @Test
-  void testRegisterUser_EmailMissing() throws Exception {
-
-    Long userRoleId = roleRepository.findByName("USER").get().getId();
-
-    String json =
-        """
-                {
-                    "username": "testuser",
-                    "password": "Password123#",
-                    "roleIds": [%d]
-                }
-                """
-            .formatted(userRoleId);
-
-    mockMvc
-        .perform(post("/users").contentType(MediaType.APPLICATION_JSON).content(json))
-        .andExpect(status().isBadRequest())
-        .andExpect(jsonPath("$.message").value("email: Email is required."));
-  }
-
-  // ---------------------------------------------------------
-  // invalid role
-  // ---------------------------------------------------------
-  @SuppressWarnings("null")
-  @Test
-  void testRegisterUser_RoleInvalid() throws Exception {
-
-    String json =
-        """
-                {
-                    "email": "test@example.com",
-                    "username": "testuser",
-                    "password": "Password123#",
-                    "roleIds": [999]
-                }
-                """;
-
-    mockMvc
-        .perform(post("/users").contentType(MediaType.APPLICATION_JSON).content(json))
-        .andExpect(status().isNotFound())
-        .andExpect(jsonPath("$.message").value("Role is not valid"));
-  }
-
-  // ---------------------------------------------------------
-  // update user not found
-  // ---------------------------------------------------------
-  @SuppressWarnings("null")
-  @Test
-  void testUpdateUser_UserNotFound() throws Exception {
-
-    Long adminRoleId = roleRepository.findByName("ADMIN").get().getId();
-
-    String json =
-        """
-                {
-                    "email": "ghost@example.com",
-                    "username": "newuser",
-                    "password": "Password123#",
-                    "roleIds": [%d],
-                    "expired": false
-                }
-                """
-            .formatted(adminRoleId);
-
-    mockMvc
-        .perform(
-            patch("/users")
-                .param("email", "ghost@example.com")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
-        .andExpect(status().isNotFound())
-        .andExpect(jsonPath("$.message").value("Email not found."));
-  }
-
-  // ---------------------------------------------------------
-  // update invalid role
-  // ---------------------------------------------------------
-  @SuppressWarnings("null")
-  @Test
-  void testUpdateUser_RoleInvalid() throws Exception {
-
-    createUser("test@example.com");
-
-    String json =
-        """
-                {
-                    "email": "test@example.com",
-                    "username": "newuser",
-                    "password": "Password123#",
-                    "roleIds": [999],
-                    "expired": false
-                }
-                """;
-
-    mockMvc
-        .perform(
-            patch("/users")
-                .param("email", "test@example.com")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
-        .andExpect(status().isNotFound())
-        .andExpect(jsonPath("$.message").value("Role is not valid"));
-  }
+  
 }

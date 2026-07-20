@@ -58,4 +58,26 @@ public class AuthController {
     SessionResponseDTO response = authService.me(sessionToken);
     return ResponseEntity.ok(response);
   }
+
+// ---------------------------------------------------------
+// REQUEST PASSWORD RESET (USER) → generates token + sends email
+// ---------------------------------------------------------
+@PostMapping("/reset-password/request")
+public ResponseEntity<Void> requestPasswordReset(@RequestParam String email) {
+    authService.requestPasswordReset(email);
+    return ResponseEntity.ok().build();
+}
+
+// ---------------------------------------------------------
+// CONFIRM PASSWORD RESET (USER) → uses token + sets new password
+// ---------------------------------------------------------
+@PostMapping("/reset-password/confirm")
+public ResponseEntity<Void> confirmPasswordReset(
+        @RequestParam String token,
+        @RequestParam String newPassword) {
+
+    authService.confirmPasswordReset(token, newPassword);
+    return ResponseEntity.ok().build();
+}
+
 }

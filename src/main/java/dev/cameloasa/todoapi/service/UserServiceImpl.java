@@ -3,15 +3,18 @@ package dev.cameloasa.todoapi.service;
 import dev.cameloasa.todoapi.converter.UserConverter;
 import dev.cameloasa.todoapi.domanin.dto.UserDTOForm;
 import dev.cameloasa.todoapi.domanin.dto.UserDTOView;
+import dev.cameloasa.todoapi.domanin.entity.PasswordResetToken;
 import dev.cameloasa.todoapi.domanin.entity.Role;
 import dev.cameloasa.todoapi.domanin.entity.User;
 import dev.cameloasa.todoapi.exception.DataDuplicateException;
 import dev.cameloasa.todoapi.exception.DataNotFoundException;
+import dev.cameloasa.todoapi.repository.PasswordResetTokenRepository;
 import dev.cameloasa.todoapi.repository.PersonRepository;
 import dev.cameloasa.todoapi.repository.RoleRepository;
 import dev.cameloasa.todoapi.repository.UserRepository;
 import java.util.List;
 import java.util.Set;
+
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,10 +26,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserServiceImpl implements UserService {
 
   private final UserRepository userRepository;
-  private final RoleRepository roleRepository;
   private final PersonRepository personRepository;
-  private final PasswordEncoder passwordEncoder;
+  private final RoleRepository roleRepository;
+  
+  
   private final UserConverter userConverter;
+
+  private final PasswordEncoder passwordEncoder;
+  private final EmailServiceImpl emailService;
 
   @Override
   @Transactional
@@ -119,22 +126,21 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  @Transactional
-  public UserDTOView update(String email, UserDTOForm dtoForm) {
+@Transactional
+public UserDTOView resetPassword(String email, String newPassword) {
     validateEmailExists(email);
 
-    User existingUser = userRepository.findById(email).orElseThrow();
+    User user = userRepository.findById(email).orElseThrow();
 
-    existingUser.setUsername(dtoForm.getUsername());
-    existingUser.setEmail(dtoForm.getEmail());
-    existingUser.setPassword(passwordEncoder.encode(dtoForm.getPassword()));
-    existingUser.setExpired(dtoForm.isExpired());
+    String encoded = passwordEncoder.encode(newPassword);
+    userRepository.updatePasswordByEmail(email, encoded);
 
-    // NU modificăm roluri aici!
+    // token = null → admin reset
+    emailService.sendPasswordResetEmail(email, null);
 
-    User updatedUser = userRepository.save(existingUser);
-    return userConverter.toUserDTOView(updatedUser);
-  }
+    return userConverter.toUserDTOView(user);
+}
+
 
   @Transactional
   public UserDTOView updateRoles(String email, List<Long> roleIds) {

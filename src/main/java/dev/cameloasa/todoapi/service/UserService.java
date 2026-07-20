@@ -21,8 +21,8 @@ public interface UserService {
   // Get all users
   List<UserDTOView> getAll();
 
-  // Update user (email, username, roles, expired)
-  UserDTOView update(String email, UserDTOForm dtoForm);
+  // Reset password (reset password, expired)
+  UserDTOView resetPassword(String email, String newPassword);
 
   // Update user ( roles)
   UserDTOView updateRoles(String email, List<Long> roleIds);
@@ -35,4 +35,6 @@ public interface UserService {
 
   // Enable user (expired = false)
   void enableEmail(String email);
+
+  
 }
